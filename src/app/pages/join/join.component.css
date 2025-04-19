@@ -1,0 +1,11 @@
+/* Ensure the tabs take full width */
+mat-tab-group {
+  width: 100%;
+}
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full height to center vertically */
+  /*padding: 20px;*/
+}

@@ -1,0 +1,57 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+
+interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface RegisterData {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  password: string;
+  is_teacher: boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = 'http://127.0.0.1:8000/api/users/';
+
+  constructor(private http: HttpClient) {}
+
+  login(username: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}login/`, { username, password }).pipe(
+      tap(response => {
+        if (response.access_token && response.refresh_token) {
+          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('refresh_token', response.refresh_token);
+        }
+      })
+    );
+  }
+
+  register(userData: RegisterData): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}register/`, userData).pipe(
+      tap(response => {
+        if (response.access_token && response.refresh_token) {
+          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('refresh_token', response.refresh_token);
+        }
+      })
+    );
+  }
+
+  logout(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('access_token'); // Returns true if token exists
+  }
+}

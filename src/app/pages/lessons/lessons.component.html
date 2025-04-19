@@ -1,0 +1,24 @@
+<h2>All Kanji Matches</h2>
+<app-match-kanji-generator/>
+
+<mat-table [dataSource]="matches" class="mat-elevation-z8">
+
+  <ng-container matColumnDef="kanji">
+    <mat-header-cell *matHeaderCellDef> Kanji </mat-header-cell>
+    <mat-cell *matCellDef="let match"> {{ match.kanji }} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="answer">
+    <mat-header-cell *matHeaderCellDef> Meaning </mat-header-cell>
+    <mat-cell *matCellDef="let match"> {{ match.answer }} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="jlpt">
+    <mat-header-cell *matHeaderCellDef> JLPT </mat-header-cell>
+    <mat-cell *matCellDef="let match"> N{{ match.jlpt_level }} </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="['kanji', 'answer', 'jlpt']"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: ['kanji', 'answer', 'jlpt'];"></mat-row>
+</mat-table>
+

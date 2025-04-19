@@ -1,0 +1,17 @@
+<!--Kanji widget on the home page that generates random kanji-->
+<mat-card class="kanji-card">
+  <mat-card-header>
+    <mat-card-title>Kanji of the Day</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="kanji-container">
+      <span class="kanji">{{ kanji }}</span>
+    </div>
+    <div class="kanji-details">
+      <p><strong>JLPT Level:</strong> {{ jlptLevel || 'N/A' }}</p>
+      <p><strong>Meanings:</strong> {{ meanings.join(', ') }}</p>
+      <p><strong>Kun'yomi:</strong> {{ kunReadings.join(', ') || 'N/A' }}</p>
+      <p><strong>On'yomi:</strong> {{ onReadings.join(', ') || 'N/A' }}</p>
+    </div>
+  </mat-card-content>
+</mat-card>

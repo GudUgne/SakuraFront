@@ -1,0 +1,74 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ensures it fills the screen */
+  background-color: #f4f4f4;
+  width: 100vw; /* Ensures no weird left margins */
+}
+
+.register-card {
+  width: 90%; /* Make it take a bit more space */
+  max-width: 450px; /* Slightly wider than before */
+  padding: 24px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: white;
+  text-align: center;
+}
+
+/* Align two inputs in a row */
+.form-row {
+  display: flex;
+  gap: 12px; /* Space between fields */
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+/* Make sure fields adjust evenly */
+.half-width {
+  flex: 1;
+  min-width: 150px; /* Prevents fields from shrinking too much */
+}
+
+/* Full width for inputs and buttons */
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Style the title */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* Radio button group styling */
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+}
+
+/* Ensure Material fields are visible */
+mat-form-field {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsive: Stack inputs on smaller screens */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,29 @@
+.todo-card {
+  flex: 1;
+min-width: 350px;
+  max-width: 450px;
+  min-height:350px;
+display: flex;
+  flex-direction: column;
+justify-content: space-between;
+padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.no-tasks {
+  text-align: center;
+  color: gray;
+  margin-top: 10px;
+}

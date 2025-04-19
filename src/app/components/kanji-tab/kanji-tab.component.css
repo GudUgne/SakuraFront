@@ -1,0 +1,131 @@
+.kanji-section {
+  padding: 24px;
+  text-align: center;
+
+}
+
+.filter-bar {
+  margin-bottom: 24px;
+}
+
+.kanji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+  gap: 12px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.reset-btn {
+  margin-left: 16px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  transition: background-color 0.2s ease;
+}
+
+.reset-btn:hover {
+  background-color: #ddd;
+}
+.filter-bar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.no-kanji-message {
+  text-align: center;
+  font-size: 16px;
+  color: #777;
+  padding: 12px;
+}
+
+.kanji-count {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 15px;
+  color: #444;
+}
+
+.drawer-container {
+  height: calc(100vh - 64px); /* adjust if you have a top toolbar */
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.kanji-info-panel {
+  width: 320px;
+  padding: 0;
+
+    min-width: 320px;
+    max-width: 320px;
+    box-sizing: border-box;
+    overflow-x: hidden; /* ✅ prevent horizontal scroll */
+
+}
+
+.kanji-panel-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden; /* ✅ remove this line if not present already */
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.kanji-char {
+  font-size: 64px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.kanji-info {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.close-button {
+  align-self: flex-end;
+  margin-bottom: 12px;
+  font-size: 32px;
+}
+
+.kanji-card {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  height: 90px;
+  font-size: 40px;
+  font-weight: normal;
+  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kanji-card.selected {
+  background-color: #fce4ec; /* soft pink (Material Pink 50) */
+  border: 2px solid #f06292; /* medium pink (Material Pink 300) */
+  box-shadow: 0 2px 6px rgba(240, 98, 146, 0.2); /* light pink shadow */
+  font-weight: bold;
+  transform: scale(1.02);
+  z-index: 1;
+}
+

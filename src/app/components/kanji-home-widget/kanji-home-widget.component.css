@@ -1,0 +1,33 @@
+.kanji-card {
+  flex: 1;
+min-width: 350px;
+  max-width: 450px;
+  min-height: 100%;
+display: flex;
+  flex-direction: column;
+justify-content: space-between;
+padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.kanji-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.kanji {
+  font-size: 6rem;
+font-weight: bold;
+  color: #333;
+}
+
+.kanji-details {
+  text-align: left;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  padding: 10px;
+}

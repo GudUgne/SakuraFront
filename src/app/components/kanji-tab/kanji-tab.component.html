@@ -1,0 +1,70 @@
+<!--Kanji character table with right panel thing when clicking on kanji-->
+<mat-drawer-container class="drawer-container" autosize>
+  <!-- ➤ Right-side drawer panel -->
+  <mat-drawer #drawer mode="side" position="end" [opened]="!!kanjiDetails" class="kanji-info-panel">
+    <div class="kanji-panel-content" *ngIf="kanjiDetails">
+      <button mat-icon-button class="close-button" (click)="closePanel(drawer)">
+        <mat-icon>close</mat-icon>
+      </button>
+      <div class="kanji-char">{{ kanjiDetails.kanji }}</div>
+      <div class="kanji-info">
+        <div><strong>Meaning:</strong> {{ kanjiDetails.meanings.join(', ') }}</div>
+        <div><strong>On Readings:</strong> {{ kanjiDetails.on_readings.join(', ') }}</div>
+        <div><strong>Kun Readings:</strong> {{ kanjiDetails.kun_readings.join(', ') }}</div>
+        <div><strong>Stroke Count:</strong> {{ kanjiDetails.stroke_count }}</div>
+        <div *ngIf="kanjiDetails.jlpt"><strong>JLPT Level:</strong> N{{ kanjiDetails.jlpt }}</div>
+      </div>
+    </div>
+  </mat-drawer>
+
+  <!-- ➤ Main content -->
+  <div class="kanji-section" (click)="closeIfClickedOutside(drawer)">
+    <h3>Kanji by JLPT Level</h3>
+
+    <div class="filter-bar">
+      <mat-form-field appearance="outline">
+        <mat-label>JLPT Level</mat-label>
+        <mat-select [(value)]="selectedLevel" (selectionChange)="onLevelChange($event.value)">
+          <mat-option *ngFor="let level of levels" [value]="level">N{{ level }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Stroke Count</mat-label>
+        <mat-select [(value)]="selectedStroke" (selectionChange)="onStrokeChange($event.value)">
+          <mat-option *ngFor="let stroke of strokeOptions" [value]="stroke">
+            {{ stroke === 'any' ? 'Any' : stroke }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button color="primary" (click)="resetFilters()">
+        Reset Filters
+      </button>
+    </div>
+
+    <div class="kanji-count" *ngIf="!loading">
+      Showing <strong>{{ kanjiList.length }}</strong> kanji
+    </div>
+
+    <div *ngIf="loading" class="spinner-wrapper">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div *ngIf="!loading && kanjiList.length === 0" class="no-kanji-message">
+      No kanji found with these filters.
+    </div>
+
+    <div class="kanji-grid" *ngIf="!loading">
+      <div
+        class="kanji-card"
+        *ngFor="let kanji of kanjiList"
+        (click)="selectKanji(kanji)"
+        [class.selected]="kanji === selectedKanji"
+      >
+        {{ kanji }}
+      </div>
+    </div>
+  </div>
+
+</mat-drawer-container>

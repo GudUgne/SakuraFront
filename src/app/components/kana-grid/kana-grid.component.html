@@ -1,0 +1,61 @@
+<!--Grid for hiragana and katakana tables-->
+<div class="kana-section">
+  <h3>Basic Sounds</h3>
+  <div class="kana-table-rtl centered">
+    <div class="kana-row header-row">
+      <div
+        class="kana-header"
+        *ngFor="let consonant of tableData[0]?.consonants.slice().reverse()"
+      >
+        {{ consonant }}
+      </div>
+      <div class="kana-label right-label invisible-label"></div> <!-- keep alignment -->
+    </div>
+
+
+    <div class="kana-row" *ngFor="let row of tableData; let rowIndex = index">
+      <div
+        class="kana-cell"
+        *ngFor="let kana of row.kana.slice().reverse(); let colIndex = index"
+        (click)="toggleFlip(rowIndex, colIndex)"
+        [class.flipped]="flipped[rowIndex][colIndex]"
+      >
+        {{ flipped[rowIndex][colIndex] ? row.romaji.slice().reverse()[colIndex] : kana }}
+      </div>
+      <div class="kana-label right-label">{{ row.vowel }}</div>
+    </div>
+  </div>
+</div>
+
+
+<div class="kana-section">
+  <h3>Compound Sounds</h3>
+  <div class="kana-table-rtl centered">
+    <div class="kana-row header-row">
+      <div
+        class="kana-header"
+        *ngFor="let consonant of compoundData[0]?.consonants.slice().reverse()"
+      >
+        {{ consonant }}
+      </div>
+      <div class="kana-label right-label"></div>
+    </div>
+
+    <div
+      class="kana-row"
+      *ngFor="let row of compoundData; let rowIndex = index"
+    >
+      <div
+        class="kana-cell"
+        *ngFor="let kana of row.kana.slice().reverse(); let colIndex = index"
+        (click)="toggleFlip(rowIndex, colIndex, true)"
+        [class.flipped]="compoundFlipped[rowIndex][colIndex]"
+      >
+        {{ compoundFlipped[rowIndex][colIndex] ? row.romaji.slice().reverse()[colIndex] : kana }}
+      </div>
+      <div class="kana-label right-label">{{ row.vowel }}</div>
+    </div>
+  </div>
+</div>
+
+

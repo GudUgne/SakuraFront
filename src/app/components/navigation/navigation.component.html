@@ -1,0 +1,64 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- Sidebar -->
+  <mat-sidenav #sidenav class="sidenav" mode="side" opened="true" role="navigation">
+    <div class="sidenav-header">
+      <h2>Sakura</h2>
+    </div>
+    <mat-nav-list>
+      <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="home"
+         routerLinkActive="active-link">Home</a>
+      <mat-accordion>
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Learning</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-action-list>
+            <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="vocabulary"
+                           routerLinkActive="active-link">
+              Vocabulary
+            </a>
+            <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="characters"
+                           routerLinkActive="active-link">
+              Characters
+            </a>
+            <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="flashcards"
+                           routerLinkActive="active-link">
+              Flashcards
+            </a>
+            <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="lessons"
+                           routerLinkActive="active-link">
+              Lessons
+            </a>
+          </mat-action-list>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <!-- Other Links -->
+      <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="messages"
+                     routerLinkActive="active-link">
+        Messages
+      </a>
+      <a mat-list-item [routerLinkActiveOptions]="{ exact: true }"  routerLink="studygroups"
+                     routerLinkActive="active-link">
+        Study Groups
+      </a>
+      <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="profile"
+                     routerLinkActive="active-link">
+        Profile
+      </a>
+      <a mat-list-item (click)="logout()" routerLinkActive="active-link">
+        Log out
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Main Content -->
+  <mat-sidenav-content class="main-content">
+    <mat-toolbar color="primary">
+      <button (click)="sidenav.toggle()" mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Menu</span>
+    </mat-toolbar>
+      <router-outlet/>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,53 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <h2 class="title">Register</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+      <mat-radio-group formControlName="role" class="radio-group">
+        <mat-radio-button value="teacher">Teacher</mat-radio-button>
+        <mat-radio-button value="student">Student</mat-radio-button>
+      </mat-radio-group>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" type="text" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Surname</mat-label>
+          <input matInput formControlName="surname" type="text" required>
+        </mat-form-field>
+      </div>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" type="text" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" required>
+        </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Repeat Password</mat-label>
+          <input matInput formControlName="repeatPassword" type="password" required>
+          <mat-error *ngIf="registerForm.hasError('notMatching')">Passwords do not match</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button mat-raised-button color="primary" type="submit" class="full-width">Register</button>
+    </form>
+  </mat-card>
+</div>
