@@ -1,0 +1,32 @@
+<div *ngIf="!loading">
+  <h2>Your Study Groups</h2>
+  <ul>
+    <li *ngFor="let group of groups">
+      {{ group.name }} (Teacher: {{ group.teacher.username }})
+    </li>
+  </ul>
+
+  <div *ngIf="!isTeacher">
+    <h3>Request to Join a Group</h3>
+    <input type="number" [(ngModel)]="joinGroupId" placeholder="Group ID" />
+    <button (click)="requestJoin()">Request</button>
+  </div>
+
+  <div *ngIf="isTeacher">
+    <h3>Create New Group</h3>
+    <input type="text" [(ngModel)]="newGroupName" placeholder="Group Name" />
+    <button (click)="createGroup()">Create</button>
+
+    <h3>Pending Join Requests</h3>
+    <ul>
+      <li *ngFor="let req of pendingRequests">
+        {{ req.student.username }} wants to join {{ req.group.name }}
+        <button (click)="approve(req.group.id, req.student.id)">Approve</button>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div *ngIf="loading">
+  <p>Loading...</p>
+</div>

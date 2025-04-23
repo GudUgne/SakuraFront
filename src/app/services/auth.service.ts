@@ -7,6 +7,16 @@ interface AuthResponse {
   refresh_token: string;
 }
 
+export interface User {
+  id?: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  is_teacher: boolean;
+  verification_status: boolean;
+}
+
 export interface RegisterData {
   first_name: string;
   last_name: string;
@@ -21,6 +31,7 @@ export interface RegisterData {
 })
 export class AuthService {
   private apiUrl = 'http://127.0.0.1:8000/api/users/';
+  private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -53,5 +64,20 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('access_token'); // Returns true if token exists
+  }
+
+  getCurrentUser(): Observable<User> {
+    if (this.currentUser) {
+      return new Observable((observer) => {
+        observer.next(this.currentUser!);
+        observer.complete();
+      });
+    }
+
+    return this.http.get<User>(`${this.apiUrl}me/`).pipe(
+      tap((user) => {
+        this.currentUser = user;
+      })
+    );
   }
 }

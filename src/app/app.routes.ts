@@ -9,7 +9,7 @@ import { CharactersComponent } from './pages/characters/characters.component';
 import { FlashcardsComponent } from './pages/flashcards/flashcards.component';
 import { LessonsComponent } from './pages/lessons/lessons.component';
 import { MessagesComponent } from './pages/messages/messages.component';
-import { StudygroupsComponent } from './pages/studygroups/studygroups.component';
+import { StudyGroupsComponent } from './pages/studygroups/study-groups.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthGuard} from './auth.guard';
 
@@ -30,7 +30,7 @@ export const routes: Routes = [
       { path: 'flashcards', component: FlashcardsComponent },
       { path: 'lessons', component: LessonsComponent },
       { path: 'messages', component: MessagesComponent },
-      { path: 'studygroups', component: StudygroupsComponent },
+      { path: 'studygroups', component: StudyGroupsComponent },
       { path: 'profile', component: ProfileComponent },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ]
