@@ -41,9 +41,23 @@ export class AuthService {
         if (response.access_token && response.refresh_token) {
           localStorage.setItem('access_token', response.access_token);
           localStorage.setItem('refresh_token', response.refresh_token);
+          this.fetchAndStoreCurrentUser();
         }
       })
     );
+  }
+
+  private fetchAndStoreCurrentUser(): void {
+    this.http.get<User>(`${this.apiUrl}me/`).subscribe({
+      next: (user) => {
+        console.log('Fetched user info after login:', user);
+        this.currentUser = user;
+        localStorage.setItem('user_id', user.id!.toString());
+      },
+      error: (error) => {
+        console.error('Error fetching user info after login', error);
+      }
+    });
   }
 
   register(userData: RegisterData): Observable<AuthResponse> {
@@ -60,6 +74,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    this.currentUser = null;
   }
 
   isAuthenticated(): boolean {
@@ -80,4 +95,17 @@ export class AuthService {
       })
     );
   }
+
+  refreshToken(): Observable<any> {
+    const refresh_token = localStorage.getItem('refresh_token');
+    return this.http.post<{ access: string }>(
+      'http://127.0.0.1:8000/api/users/token/refresh/',
+      { refresh: refresh_token }
+    ).pipe(
+      tap((response) => {
+        localStorage.setItem('access_token', response.access);
+      })
+    );
+  }
+
 }

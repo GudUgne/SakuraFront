@@ -1,7 +1,11 @@
-<!--<div>-->
-<!--  <h2>Theme Settings</h2>-->
-<!--  <mat-radio-group [(ngModel)]="isDarkTheme" (change)="onThemeChange(isDarkTheme)">-->
-<!--    <mat-radio-button [value]="false">Light Mode</mat-radio-button>-->
-<!--    <mat-radio-button [value]="true">Dark Mode</mat-radio-button>-->
-<!--  </mat-radio-group>-->
-<!--</div>-->
+<mat-card class="profile-card" *ngIf="user">
+  <mat-card-title>Profile</mat-card-title>
+
+  <mat-list>
+    <mat-list-item><strong>First Name:</strong> {{ user.first_name }}</mat-list-item>
+    <mat-list-item><strong>Last Name:</strong> {{ user.last_name }}</mat-list-item>
+    <mat-list-item><strong>Username:</strong> {{ user.username }}</mat-list-item>
+    <mat-list-item><strong>Email:</strong> {{ user.email }}</mat-list-item>
+    <mat-list-item><strong>Occupation:</strong> {{ getOccupation() }}</mat-list-item>
+  </mat-list>
+</mat-card>

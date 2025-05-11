@@ -29,6 +29,9 @@ export class KanjiTabComponent implements OnInit {
   kanjiList: string[] = [];
   loading = false;
 
+  sortOptions = ['none', 'most frequent', 'least frequent'];
+  selectedSort = 'none';
+
   constructor(private kanjiService: KanjiService) {}
 
   ngOnInit(): void {
@@ -56,24 +59,33 @@ export class KanjiTabComponent implements OnInit {
 
     this.kanjiService.getKanjiByJLPT(this.selectedLevel).pipe(
       switchMap(kanjiList => {
-        if (this.selectedStroke === 'any') {
-          return of(kanjiList);
+        // Always fetch details first
+        return forkJoin(kanjiList.map(k => this.kanjiService.getKanjiDetails(k)));
+      }),
+      map(details => {
+        // 1. Filter by stroke count if needed
+        if (this.selectedStroke !== 'any') {
+          const strokeNumber = this.selectedStroke === '10+' ? 10 : parseInt(this.selectedStroke, 10);
+          details = details.filter(k =>
+            this.selectedStroke === '10+'
+              ? k.stroke_count >= 10
+              : k.stroke_count === strokeNumber
+          );
         }
 
-        const strokeNumber = this.selectedStroke === '10+' ? 10 : parseInt(this.selectedStroke, 10);
+        // 2. Sort by frequency if needed
+        if (this.selectedSort === 'most frequent') {
+          details.sort((a, b) =>
+            (a.freq_mainichi_shinbun ?? Infinity) - (b.freq_mainichi_shinbun ?? Infinity)
+          );
+        } else if (this.selectedSort === 'least frequent') {
+          details.sort((a, b) =>
+            (b.freq_mainichi_shinbun ?? -1) - (a.freq_mainichi_shinbun ?? -1)
+          );
+        }
 
-        // Fetch stroke counts for each kanji
-        return forkJoin(kanjiList.map(k => this.kanjiService.getKanjiDetails(k))).pipe(
-          map(details => {
-            return details
-              .filter(k => {
-                return this.selectedStroke === '10+'
-                  ? k.stroke_count >= 10
-                  : k.stroke_count === strokeNumber;
-              })
-              .map(k => k.kanji);
-          })
-        );
+        // 3. Return kanji characters only
+        return details.map(k => k.kanji);
       })
     ).subscribe({
       next: data => {
@@ -86,6 +98,7 @@ export class KanjiTabComponent implements OnInit {
       }
     });
   }
+
 
   selectedKanji: string | null = null;
   kanjiDetails: any = null;

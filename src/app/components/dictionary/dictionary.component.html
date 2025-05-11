@@ -1,0 +1,72 @@
+<div class="dictionary-container">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Enter a word or kanji</mat-label>
+    <input matInput [(ngModel)]="searchTerm" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Search Type</mat-label>
+    <mat-select [(ngModel)]="searchType" (selectionChange)="clearResults()">
+      <mat-option value="words">Word</mat-option>
+      <mat-option value="kanji">Kanji</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" (click)="search()">Search</button>
+
+  <mat-spinner *ngIf="isLoading" diameter="40" style="margin: 2rem auto;"></mat-spinner>
+
+  <!-- WORD RESULTS -->
+  <div *ngIf="results && searchType === 'words'" class="results-wrapper">
+    <mat-card *ngFor="let word of results.words">
+      <mat-card-title>
+      <span class="reading-text">
+        {{ word.reading.kana }}
+        <span *ngIf="word.reading.kanji"> ({{ word.reading.kanji }})</span>
+      </span>
+      </mat-card-title>
+
+      <mat-card-content>
+        <div *ngIf="word.audio" class="audio-button-wrapper">
+          <button
+            mat-icon-button
+            color="primary"
+            aria-label="Play audio"
+            (click)="playAudio(word.audio)"
+          >
+            <mat-icon>volume_up</mat-icon>
+          </button>
+        </div>
+
+        <div *ngFor="let sense of word.senses" class="sense-line">
+          <p>
+            <strong *ngIf="sense.partOfSpeech?.length">
+              {{ sense.partOfSpeech.join(', ') }}:
+            </strong>
+            {{ sense.glosses.join(', ') }}
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- KANJI RESULTS -->
+  <div *ngIf="results && searchType === 'kanji'" class="results-wrapper">
+    <mat-card *ngFor="let kanji of results.kanji">
+      <mat-card-title>
+        <span style="font-size: 2.5rem;">{{ kanji.literal }}</span> — JLPT N{{ kanji.jlpt || '–' }}
+      </mat-card-title>
+      <mat-card-content>
+        <p><strong>Meanings:</strong> {{ kanji.meanings?.join(', ') }}</p>
+        <p><strong>Onyomi:</strong> {{ kanji.onyomi?.join(', ') }}</p>
+        <p><strong>Kunyomi:</strong> {{ kanji.kunyomi?.join(', ') }}</p>
+        <p><strong>Radical:</strong> {{ kanji.radical }}</p>
+        <p><strong>Stroke Count:</strong> {{ kanji.stroke_count }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <p *ngIf="results && ((searchType === 'words' && results.words?.length === 0) || (searchType === 'kanji' && results.kanji?.length === 0))">
+    No results found.
+  </p>
+</div>

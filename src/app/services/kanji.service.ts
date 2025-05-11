@@ -10,6 +10,7 @@ export interface KanjiData {
   on_readings: string[];
   jlpt?: number;
   stroke_count: number;
+  freq_mainichi_shinbun?: number | null;
 }
 
 @Injectable({

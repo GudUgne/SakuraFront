@@ -13,6 +13,10 @@
         <div><strong>Kun Readings:</strong> {{ kanjiDetails.kun_readings.join(', ') }}</div>
         <div><strong>Stroke Count:</strong> {{ kanjiDetails.stroke_count }}</div>
         <div *ngIf="kanjiDetails.jlpt"><strong>JLPT Level:</strong> N{{ kanjiDetails.jlpt }}</div>
+        <div>
+          <strong>Frequency in newspapers:</strong>
+          {{ kanjiDetails.freq_mainichi_shinbun !== null ? kanjiDetails.freq_mainichi_shinbun : 'no ranking' }}
+        </div>
       </div>
     </div>
   </mat-drawer>
@@ -35,6 +39,13 @@
           <mat-option *ngFor="let stroke of strokeOptions" [value]="stroke">
             {{ stroke === 'any' ? 'Any' : stroke }}
           </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Sort by</mat-label>
+        <mat-select [(value)]="selectedSort" (selectionChange)="fetchKanji()">
+          <mat-option *ngFor="let sort of sortOptions" [value]="sort">{{ sort }}</mat-option>
         </mat-select>
       </mat-form-field>
 

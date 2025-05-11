@@ -1,13 +1,13 @@
 .todo-card {
   flex: 1;
-min-width: 350px;
+  min-width: 350px;
   max-width: 450px;
   min-height:350px;
-display: flex;
+  display: flex;
   flex-direction: column;
-justify-content: space-between;
-padding: 20px;
-  text-align: center;
+  justify-content: space-between;
+  padding: 20px;
+  text-align: start;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -16,14 +16,47 @@ padding: 20px;
   width: 100%;
 }
 
-mat-list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 .no-tasks {
   text-align: center;
   color: gray;
   margin-top: 10px;
+}
+
+
+.task-content {
+  display: flex;
+  align-items: center; /* finally center within this container */
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+mat-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  gap: 8px;
+}
+
+.task-item {
+  width: 100%;
+}
+
+mat-checkbox {
+  margin: 0;
+  padding: 0;
+}
+
+.task-text {
+  flex-grow: 1;
+  text-align: left;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #888;
 }

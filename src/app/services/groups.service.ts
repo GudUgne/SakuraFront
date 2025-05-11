@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class GroupsService {
-  private baseUrl = '/api/groups/';
+  private baseUrl = 'http://127.0.0.1:8000/api/groups/';
 
   constructor(private http: HttpClient) {}
 
@@ -29,4 +29,9 @@ export class GroupsService {
   approveStudent(groupId: number, studentId: number): Observable<any> {
     return this.http.post(this.baseUrl + `${groupId}/approve/${studentId}/`, {});
   }
+
+  getStudentPendingRequests(): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrl + 'my-pending-requests/');
+  }
+
 }

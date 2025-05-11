@@ -1,0 +1,57 @@
+<div class="chat-container">
+
+  <button mat-icon-button (click)="back.emit()" aria-label="Back to chat list">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <!-- User selector -->
+  <mat-form-field appearance="fill" class="user-select">
+    <mat-label>Choose a user to chat with</mat-label>
+    <mat-select [(ngModel)]="chatPartnerId">
+      <mat-option *ngFor="let user of users" [value]="user.id">
+        {{ user.username }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Chat header -->
+  <div *ngIf="chatPartnerInfo" class="chat-header">
+    Chatting with:
+    <b>{{ chatPartnerInfo.first_name }} {{ chatPartnerInfo.last_name }}</b>
+    ({{ chatPartnerInfo.username }})
+  </div>
+
+  <!-- Chat messages -->
+  <div class="messages">
+    <mat-card *ngFor="let message of messages" [class.my-message]="message.sender === myUserId" [class.their-message]="message.sender !== myUserId">
+      <mat-card-content>
+        <b>{{ message.sender === myUserId ? 'Me' : chatPartnerInfo?.username }}:</b>
+        {{ message.message_content }}
+        <div class="timestamp">{{ message.time_sent | date:'short' }}</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+<!--Text conversion-->
+  <mat-form-field appearance="fill" class="mode-select">
+    <mat-label>Input Mode</mat-label>
+    <mat-select [(ngModel)]="inputMode" (selectionChange)="onInputModeChange()">
+      <mat-option value="english">English</mat-option>
+      <mat-option value="kana">Kana</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div *ngIf="inputMode === 'kana'" class="info-note">
+    Type normally for <b>Hiragana</b>, hold <b>Shift</b> for <b>Katakana</b>.
+  </div>
+
+  <mat-form-field appearance="fill" class="input-field">
+  <textarea
+    #kanaInput
+    matInput
+    placeholder="Type your message...">
+  </textarea>
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
+
+</div>

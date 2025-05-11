@@ -23,6 +23,7 @@ import {
   MatHeaderCellDef,
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef, MatTable
 } from '@angular/material/table';
+import {MatCheckbox} from '@angular/material/checkbox';
 
 
 export const MATERIAL_IMPORTS = [
@@ -43,6 +44,6 @@ export const MATERIAL_IMPORTS = [
   MatHeaderRow,
   MatHeaderRowDef,
   MatRow,
-  MatRowDef, MatTable
+  MatRowDef, MatTable, MatCheckbox
 ];
 

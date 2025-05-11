@@ -1,0 +1,19 @@
+.profile-card {
+  flex: 1;
+  min-width: 350px;
+  max-width: 450px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 20px;
+  text-align: start;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 40px auto; /* centers the card horizontally */
+}
+
+mat-list-item {
+  padding: 6px 0;
+  font-size: 16px;
+}

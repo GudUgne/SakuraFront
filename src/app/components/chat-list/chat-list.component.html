@@ -1,0 +1,14 @@
+<h2>Your Conversations</h2>
+
+<button mat-raised-button color="primary" (click)="chatSelected.emit(null)">
+  Start New Chat
+</button>
+
+<div *ngFor="let user of users">
+  <mat-card (click)="openChat(user.id)">
+    <mat-card-title>{{ user.username }}</mat-card-title>
+    <mat-card-content>
+      {{ getLastMessage(user.id) }}
+    </mat-card-content>
+  </mat-card>
+</div>

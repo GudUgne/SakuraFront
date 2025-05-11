@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {MATERIAL_IMPORTS} from '../../material.shared';
 import {FormsModule} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
+import {AuthService, User} from '../../services/auth.service';
 
 @Component({
   selector: 'app-todo-widget',
@@ -17,9 +18,15 @@ import {NgForOf, NgIf} from '@angular/common';
 export class TodoWidgetComponent implements OnInit {
   tasks: { text: string; completed: boolean }[] = [];
   newTask: string = '';
+  currentUser: User | null = null;
+
+  constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadTasks();
+    this.authService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+      this.loadTasks();
+    });
   }
 
   addTask(): void {
@@ -30,22 +37,19 @@ export class TodoWidgetComponent implements OnInit {
     }
   }
 
-  toggleTask(index: number): void {
-    this.tasks[index].completed = !this.tasks[index].completed;
-    this.saveTasks();
-  }
-
   deleteTask(index: number): void {
     this.tasks.splice(index, 1);
     this.saveTasks();
   }
 
   saveTasks(): void {
-    localStorage.setItem('todoTasks', JSON.stringify(this.tasks));
+    if (!this.currentUser) return;
+    localStorage.setItem(`todoTasks-${this.currentUser.username}`, JSON.stringify(this.tasks));
   }
 
   loadTasks(): void {
-    const savedTasks = localStorage.getItem('todoTasks');
+    if (!this.currentUser) return;
+    const savedTasks = localStorage.getItem(`todoTasks-${this.currentUser.username}`);
     if (savedTasks) {
       this.tasks = JSON.parse(savedTasks);
     }

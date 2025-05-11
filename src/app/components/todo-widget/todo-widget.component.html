@@ -1,19 +1,23 @@
 <mat-card class="todo-card">
   <mat-card-title>To-Do List</mat-card-title>
+
   <mat-form-field class="full-width">
     <input matInput placeholder="New Task" [(ngModel)]="newTask" (keyup.enter)="addTask()">
   </mat-form-field>
+
   <button mat-raised-button color="primary" (click)="addTask()">Add Task</button>
 
   <mat-list *ngIf="tasks.length > 0">
-    <mat-list-item *ngFor="let task of tasks; let i = index">
-      <mat-checkbox [(ngModel)]="task.completed" (change)="toggleTask(i)">
-        {{ task.text }}
-      </mat-checkbox>
-      <button mat-icon-button color="warn" (click)="deleteTask(i)">
-        <mat-icon>delete</mat-icon>
-      </button>
+    <mat-list-item *ngFor="let task of tasks; let i = index" class="task-item">
+      <div class="task-content">
+        <mat-checkbox [(ngModel)]="task.completed" (change)="saveTasks()"></mat-checkbox>
+        <span [class.completed]="task.completed" class="task-text">{{ task.text }}</span>
+        <button mat-icon-button color="warn" (click)="deleteTask(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </mat-list-item>
   </mat-list>
+
   <p *ngIf="tasks.length === 0" class="no-tasks">There are no tasks!</p>
 </mat-card>

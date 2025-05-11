@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -12,7 +12,7 @@ const updatedConfig = {
   ...appConfig,
   providers: [
     ...(appConfig.providers || []), // Preserve existing providers
-    provideHttpClient(),            // Enables HttpClient
+    provideHttpClient(withInterceptorsFromDi()),            // Enables HttpClient
     provideRouter(routes),          // Enables routing
     {
       provide: HTTP_INTERCEPTORS,

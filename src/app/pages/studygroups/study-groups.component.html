@@ -1,32 +1,57 @@
-<div *ngIf="!loading">
-  <h2>Your Study Groups</h2>
-  <ul>
-    <li *ngFor="let group of groups">
-      {{ group.name }} (Teacher: {{ group.teacher.username }})
-    </li>
-  </ul>
+<ng-container *ngIf="!loading">
+  <div class="container">
+  <h2>Welcome to Study Groups</h2>
 
-  <div *ngIf="!isTeacher">
-    <h3>Request to Join a Group</h3>
-    <input type="number" [(ngModel)]="joinGroupId" placeholder="Group ID" />
-    <button (click)="requestJoin()">Request</button>
-  </div>
+  <mat-card *ngIf="groups.length">
+    <mat-card-title>Your Groups</mat-card-title>
+    <mat-list>
+      <mat-list-item *ngFor="let group of groups">
+        {{ group.name }} (Teacher: {{ group.teacher.username }})
+      </mat-list-item>
+    </mat-list>
+  </mat-card>
 
-  <div *ngIf="isTeacher">
-    <h3>Create New Group</h3>
-    <input type="text" [(ngModel)]="newGroupName" placeholder="Group Name" />
-    <button (click)="createGroup()">Create</button>
+  <!-- Teacher only: Create Group -->
+  <mat-card *ngIf="isTeacher">
+    <mat-card-title>Create a New Group</mat-card-title>
+    <mat-form-field appearance="fill">
+      <mat-label>Group Name</mat-label>
+      <input matInput [(ngModel)]="newGroupName" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="createGroup()">Create</button>
+  </mat-card>
 
-    <h3>Pending Join Requests</h3>
-    <ul>
-      <li *ngFor="let req of pendingRequests">
+  <!-- Teacher only: Pending Requests -->
+  <mat-card *ngIf="!loading && isTeacher && pendingRequests?.length">
+    <mat-card-title>Pending Join Requests</mat-card-title>
+    <mat-list>
+      <mat-list-item *ngFor="let req of pendingRequests">
         {{ req.student.username }} wants to join {{ req.group.name }}
-        <button (click)="approve(req.group.id, req.student.id)">Approve</button>
-      </li>
-    </ul>
-  </div>
-</div>
+        <button mat-button color="primary" (click)="approve(req.group.id, req.student.id)">Approve</button>
+      </mat-list-item>
+    </mat-list>
+  </mat-card>
 
-<div *ngIf="loading">
-  <p>Loading...</p>
-</div>
+  <!-- Student only: Pending Requests -->
+  <mat-card *ngIf="!loading && !isTeacher && studentPendingRequests?.length">
+    <mat-card-title>Your Pending Requests</mat-card-title>
+    <mat-list>
+      <mat-list-item *ngFor="let req of studentPendingRequests">
+        Waiting for approval to join {{ req.group.name }} (Teacher: {{ req.group.teacher.username }})
+      </mat-list-item>
+    </mat-list>
+  </mat-card>
+
+  <!-- Student only: Request to Join -->
+  <mat-card *ngIf="!isTeacher">
+    <mat-card-title>Request to Join a Group</mat-card-title>
+    <mat-form-field appearance="fill">
+      <mat-label>Group Name</mat-label>
+      <input matInput type="text" [(ngModel)]="groupNameInput" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="requestJoin()">Request</button>
+  </mat-card>
+  </div>
+</ng-container>
+
+<mat-progress-spinner *ngIf="loading" mode="indeterminate"></mat-progress-spinner>

@@ -20,12 +20,33 @@ export class KanjiHomeWidgetComponent implements OnInit {
   constructor(private kanjiService: KanjiService) {}
 
   ngOnInit(): void {
-    this.kanjiService.getRandomKanji().subscribe(data => {
-      this.kanji = data.kanji;
-      this.meanings = data.meanings;
-      this.kunReadings = data.kun_readings;
-      this.onReadings = data.on_readings;
-      this.jlptLevel = data.jlpt;
-    });
+    this.loadKanjiOfTheDay();
+  }
+
+  loadKanjiOfTheDay(): void {
+    const today = new Date().toISOString().split('T')[0]; // e.g. "2025-04-25"
+    const savedDate = localStorage.getItem('kanjiOfTheDayDate');
+    const savedKanji = localStorage.getItem('kanjiOfTheDayData');
+
+    if (savedDate === today && savedKanji) {
+      // ✅ Already have today's kanji cached
+      const data = JSON.parse(savedKanji);
+      this.applyKanjiData(data);
+    } else {
+      // ❌ Need to fetch a new kanji
+      this.kanjiService.getRandomKanji().subscribe(data => {
+        this.applyKanjiData(data);
+        localStorage.setItem('kanjiOfTheDayDate', today);
+        localStorage.setItem('kanjiOfTheDayData', JSON.stringify(data));
+      });
+    }
+  }
+
+  applyKanjiData(data: any): void {
+    this.kanji = data.kanji;
+    this.meanings = data.meanings;
+    this.kunReadings = data.kun_readings;
+    this.onReadings = data.on_readings;
+    this.jlptLevel = data.jlpt;
   }
 }
