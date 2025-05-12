@@ -1,11 +1,110 @@
-<mat-card class="profile-card" *ngIf="user">
-  <mat-card-title>Profile</mat-card-title>
+<ng-container *ngIf="user">
+  <div class="container">
+    <h2>Profile Information</h2>
+    <mat-card>
+      <mat-card-title>Account Details</mat-card-title>
+      <mat-list>
 
-  <mat-list>
-    <mat-list-item><strong>First Name:</strong> {{ user.first_name }}</mat-list-item>
-    <mat-list-item><strong>Last Name:</strong> {{ user.last_name }}</mat-list-item>
-    <mat-list-item><strong>Username:</strong> {{ user.username }}</mat-list-item>
-    <mat-list-item><strong>Email:</strong> {{ user.email }}</mat-list-item>
-    <mat-list-item><strong>Occupation:</strong> {{ getOccupation() }}</mat-list-item>
-  </mat-list>
-</mat-card>
+        <!-- First Name -->
+        <mat-list-item class="profile-item">
+          <strong>First Name:</strong>
+          <ng-container *ngIf="!editMode.first_name; else editFirstName">
+            {{ user.first_name }}
+            <button mat-icon-button (click)="startEdit('first_name')">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editFirstName>
+            <mat-form-field appearance="outline">
+              <input matInput [formControl]="firstNameControl">
+            </mat-form-field>
+            <button mat-icon-button color="primary" (click)="confirmEdit('first_name')">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="cancelEdit('first_name')">
+              <mat-icon>close</mat-icon>
+            </button>
+          </ng-template>
+        </mat-list-item>
+
+        <!-- Last Name -->
+        <mat-list-item class="profile-item">
+          <strong>Last Name:</strong>
+          <ng-container *ngIf="!editMode.last_name; else editLastName">
+            {{ user.last_name }}
+            <button mat-icon-button (click)="startEdit('last_name')">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editLastName>
+            <mat-form-field appearance="outline">
+              <input matInput [formControl]="lastNameControl">
+            </mat-form-field>
+            <button mat-icon-button color="primary" (click)="confirmEdit('last_name')">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="cancelEdit('last_name')">
+              <mat-icon>close</mat-icon>
+            </button>
+          </ng-template>
+        </mat-list-item>
+
+        <!-- Username -->
+        <mat-list-item class="profile-item">
+          <strong>Username:</strong>
+          <ng-container *ngIf="!editMode.username; else editUsername">
+            {{ user.username }}
+            <button mat-icon-button (click)="startEdit('username')">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editUsername>
+            <mat-form-field appearance="outline">
+              <input matInput [formControl]="usernameControl">
+            </mat-form-field>
+            <button mat-icon-button color="primary" (click)="confirmEdit('username')">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="cancelEdit('username')">
+              <mat-icon>close</mat-icon>
+            </button>
+          </ng-template>
+        </mat-list-item>
+
+        <!-- Email -->
+        <mat-list-item class="profile-item">
+          <strong>Email:</strong>
+          <ng-container *ngIf="!editMode.email; else editEmail">
+            {{ user.email }}
+            <button mat-icon-button (click)="startEdit('email')">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editEmail>
+            <mat-form-field appearance="outline">
+              <input matInput [formControl]="emailControl">
+            </mat-form-field>
+            <button mat-icon-button color="primary" (click)="confirmEdit('email')">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="cancelEdit('email')">
+              <mat-icon>close</mat-icon>
+            </button>
+          </ng-template>
+        </mat-list-item>
+
+        <!-- Occupation (non-editable) -->
+        <mat-list-item class="profile-item">
+          <strong>Occupation:</strong> {{ getOccupation() }}
+        </mat-list-item>
+
+      </mat-list>
+    </mat-card>
+
+    <mat-card *ngIf="message">
+      <mat-card-content>
+        {{ message }}
+      </mat-card-content>
+    </mat-card>
+  </div>
+</ng-container>

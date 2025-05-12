@@ -4,10 +4,12 @@ import {AuthService, RegisterData} from '../../services/auth.service';
 import { Router } from '@angular/router';
 import {NgIf} from '@angular/common';
 import {MATERIAL_IMPORTS} from '../../material.shared';
+import {MatRadioGroup} from '@angular/material/radio';
 
 interface AuthResponse {
   access_token: string;
   refresh_token: string;
+  verification_status: boolean;
 }
 
 @Component({
@@ -17,6 +19,7 @@ interface AuthResponse {
     MATERIAL_IMPORTS,
     ReactiveFormsModule,
     NgIf,
+    MatRadioGroup,
   ],
   styleUrls: ['./register.component.css']
 })
@@ -57,6 +60,12 @@ export class RegisterComponent {
       next: (response) => {
         console.log("Registration successful!", response);
         // Redirect user to login after successful registration
+
+        if (response.verification_status) {
+          this.errorMessage = "Registration successful! Your account is verified and ready to use.";
+        } else {
+          this.errorMessage = "Registration successful! Your account requires verification before login.";
+        }
       },
       error: (err) => {
         console.error("Registration error:", err);

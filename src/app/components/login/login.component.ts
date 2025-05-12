@@ -37,8 +37,28 @@ export class LoginComponent {
     }
 
     const { username, password } = this.loginForm.value;
+
+    // this.authService.login(username, password).subscribe({
+    //   next: () => this.router.navigate(['/app/home']),
+    //   error: () => this.errorMessage = 'Invalid username or password'
+    // });
+
     this.authService.login(username, password).subscribe({
-      next: () => this.router.navigate(['/app/home']),
+      next: () => {
+        this.authService.getCurrentUser().subscribe({
+          next: (user) => {
+            if (!user.verification_status) {
+              this.errorMessage = "Your account is pending verification. Please wait for approval.";
+              this.authService.logout(); // Remove tokens if not verified
+            } else {
+              this.router.navigate(['/app/home']);
+            }
+          },
+          error: () => {
+            this.errorMessage = 'Failed to retrieve user data.';
+          }
+        });
+      },
       error: () => this.errorMessage = 'Invalid username or password'
     });
   }

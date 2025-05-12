@@ -5,6 +5,7 @@ import { Observable, tap } from 'rxjs';
 interface AuthResponse {
   access_token: string;
   refresh_token: string;
+  verification_status: boolean;
 }
 
 export interface User {
@@ -92,6 +93,15 @@ export class AuthService {
     return this.http.get<User>(`${this.apiUrl}me/`).pipe(
       tap((user) => {
         this.currentUser = user;
+      })
+    );
+  }
+
+  //when updating profile information
+  updateUser(data: Partial<User>): Observable<User> {
+    return this.http.patch<User>(`${this.apiUrl}me/`, data).pipe(
+      tap((updatedUser) => {
+        this.currentUser = updatedUser;
       })
     );
   }
