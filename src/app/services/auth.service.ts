@@ -18,6 +18,14 @@ export interface User {
   verification_status: boolean;
 }
 
+export interface UserUpdateData {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+}
+
 export interface RegisterData {
   first_name: string;
   last_name: string;
@@ -98,7 +106,7 @@ export class AuthService {
   }
 
   //when updating profile information
-  updateUser(data: Partial<User>): Observable<User> {
+  updateUser(data: UserUpdateData): Observable<User> {
     return this.http.patch<User>(`${this.apiUrl}me/`, data).pipe(
       tap((updatedUser) => {
         this.currentUser = updatedUser;

@@ -3,6 +3,7 @@ import {AuthService, User} from '../../services/auth.service';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MATERIAL_IMPORTS} from '../../material.shared';
 import {NgIf} from '@angular/common';
+import {MatDivider} from '@angular/material/divider';
 
 type EditableField = 'first_name' | 'last_name' | 'username' | 'email';
 
@@ -14,7 +15,8 @@ type EditableField = 'first_name' | 'last_name' | 'username' | 'email';
     FormsModule,
     MATERIAL_IMPORTS,
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatDivider
   ]
 })
 export class ProfileComponent implements OnInit {
@@ -34,7 +36,9 @@ export class ProfileComponent implements OnInit {
       first_name: [''],
       last_name: [''],
       username: [''],
-      email: ['', [Validators.email]]
+      email: ['', [Validators.email]],
+      new_password: [''],
+      repeat_password: ['']
     });
   }
 
@@ -93,10 +97,35 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  changePassword() {
+    const newPassword = this.form.get('new_password')?.value;
+    const repeatPassword = this.form.get('repeat_password')?.value;
+
+    if (!newPassword || !repeatPassword) {
+      this.message = 'Please fill out both password fields.';
+      return;
+    }
+
+    if (newPassword !== repeatPassword) {
+      this.message = 'Passwords do not match.';
+      return;
+    }
+
+    this.authService.updateUser({ password: newPassword }).subscribe({
+      next: () => {
+        this.message = 'Password updated successfully.';
+        this.form.get('new_password')?.reset();
+        this.form.get('repeat_password')?.reset();
+      },
+      error: () => {
+        this.message = 'Failed to update password.';
+      }
+    });
+  }
+
   getOccupation(): string {
     if (!this.user) return '';
     return this.user.is_teacher ? 'Teacher' : 'Student';
   }
 
-  protected readonly FormControl = FormControl;
 }
