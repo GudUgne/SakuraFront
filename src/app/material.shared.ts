@@ -25,6 +25,7 @@ import {
 } from '@angular/material/table';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatDivider} from '@angular/material/divider';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 export const MATERIAL_IMPORTS = [
   MatSidenavModule,
@@ -44,6 +45,6 @@ export const MATERIAL_IMPORTS = [
   MatHeaderRow,
   MatHeaderRowDef,
   MatRow,
-  MatRowDef, MatTable, MatCheckbox, MatDivider
+  MatRowDef, MatTable, MatCheckbox, MatDivider, MatAutocompleteModule
 ];
 

@@ -14,6 +14,10 @@ export class GroupsService {
     return this.http.get<any[]>(this.baseUrl);
   }
 
+  searchGroups(query: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}search/?name=${query}`);
+  }
+
   createGroup(name: string): Observable<any> {
     return this.http.post(this.baseUrl + 'create/', { name });
   }
@@ -28,6 +32,18 @@ export class GroupsService {
 
   approveStudent(groupId: number, studentId: number): Observable<any> {
     return this.http.post(this.baseUrl + `${groupId}/approve/${studentId}/`, {});
+  }
+
+  cancelStudentRequest(groupId: number, requestId: number): Observable<any> {
+    return this.http.delete(
+      `${this.baseUrl}${groupId}/requests/${requestId}/`
+    );
+  }
+
+  withdrawRequest(groupId: number): Observable<any> {
+    return this.http.delete(
+      `${this.baseUrl}${groupId}/request/`
+    );
   }
 
   getStudentPendingRequests(): Observable<any[]> {
