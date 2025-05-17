@@ -4,6 +4,7 @@ import {MATERIAL_IMPORTS} from '../../material.shared';
 
 @Component({
   selector: 'app-welcome',
+  standalone: true,
   imports: [
     MATERIAL_IMPORTS,
     RouterLink,

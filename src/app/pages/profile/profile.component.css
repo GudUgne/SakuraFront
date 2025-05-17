@@ -1,73 +1,160 @@
-/*:host {*/
-/*  display: flex;*/
-/*  justify-content: center;*/
-/*  padding: 2rem;*/
-/*}*/
-
-/*.container {*/
-/*  max-width: 700px;*/
-/*  width: 100%;*/
-/*  display: flex;*/
-/*  flex-direction: column;*/
-/*  gap: 2rem;*/
-/*}*/
-
-/*mat-card {*/
-/*  padding: 1.5rem;*/
-/*}*/
-
-/*!*come back to it, doesnt work*!*/
-/*.profile-field {*/
-/*  padding-bottom: 20px;*/
-/*  display: flex;*/
-/*  flex-wrap: wrap;*/
-/*  align-items: center;*/
-/*  gap: 8px;*/
-/*}*/
-
-.container {
-  padding: 32px;
+.profile-container {
+  padding: 20px;
   max-width: 800px;
-  margin: auto;
+  margin: 0 auto;
 }
 
-mat-card {
-  padding: 24px;
+.profile-container h2 {
+  color: #333;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 500;
 }
 
-mat-card-title {
-  font-size: 20px;
-  margin-bottom: 16px;
+.profile-card,
+.password-card {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-mat-list-item {
-  margin-bottom: 16px;
+.profile-card mat-card-title,
+.password-card mat-card-title {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .profile-field {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  min-height: 56px;
+  padding: 16px 0;
 }
 
-mat-form-field {
-  min-width: 250px;
+.field-label {
+  font-weight: 500;
+  color: #666;
+  min-width: 120px;
+  margin-right: 16px;
+}
+
+.field-value {
   flex: 1;
+  color: #333;
 }
 
-.password-section {
-  margin-top: 48px;
-  border-top: 1px solid #ccc;
-  padding-top: 24px;
+.edit-field {
+  flex: 1;
+  margin-right: 8px;
 }
 
-.section-title {
-  font-size: 18px;
-  margin-bottom: 16px;
+.edit-field .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+mat-divider {
+  margin: 8px 0;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
 }
 
 .full-width {
   width: 100%;
-  max-width: 400px;
+}
+
+.password-form button[mat-raised-button] {
+  margin-top: 16px;
+  height: 48px;
+  font-size: 16px;
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: #666;
+}
+
+/* Button hover effects */
+button[mat-icon-button]:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Error styles */
+mat-error {
+  font-size: 12px;
+}
+
+/* Snackbar styles */
+::ng-deep .success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #f44336;
+  color: white;
+}
+
+::ng-deep .info-snackbar {
+  background-color: #2196f3;
+  color: white;
+}
+
+/* Material form field adjustments */
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 12px;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label,
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float .mat-form-field-label-wrapper {
+  transform: translateY(-1.2em) scale(0.75);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 16px;
+  }
+
+  .profile-field {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .field-label {
+    margin-bottom: 8px;
+  }
+
+  .edit-field {
+    width: 100%;
+  }
+}
+
+/* Card hover effect */
+mat-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Focus states for better accessibility */
+button[mat-icon-button]:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+input:focus {
+  outline: none; /* Material handles focus styles */
 }

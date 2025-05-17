@@ -7,6 +7,7 @@ import {AuthService, User} from '../../services/auth.service';
 @Component({
   selector: 'app-todo-widget',
   templateUrl: './todo-widget.component.html',
+  standalone: true,
   imports: [
     MATERIAL_IMPORTS,
     FormsModule,

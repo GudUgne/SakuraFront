@@ -15,6 +15,7 @@ interface AuthResponse {
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
+  standalone: true,
   imports: [
     MATERIAL_IMPORTS,
     ReactiveFormsModule,

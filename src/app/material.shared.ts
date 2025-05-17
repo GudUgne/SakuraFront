@@ -24,7 +24,7 @@ import {
   MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef, MatTable
 } from '@angular/material/table';
 import {MatCheckbox} from '@angular/material/checkbox';
-
+import {MatDivider} from '@angular/material/divider';
 
 export const MATERIAL_IMPORTS = [
   MatSidenavModule,
@@ -44,6 +44,6 @@ export const MATERIAL_IMPORTS = [
   MatHeaderRow,
   MatHeaderRowDef,
   MatRow,
-  MatRowDef, MatTable, MatCheckbox
+  MatRowDef, MatTable, MatCheckbox, MatDivider
 ];
 

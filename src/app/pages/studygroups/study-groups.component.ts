@@ -10,6 +10,7 @@ import {MATERIAL_IMPORTS} from '../../material.shared';
   selector: 'app-study-groups',
   templateUrl: './study-groups.component.html',
   styleUrl: './study-groups.component.css',
+  standalone: true,
   imports: [
     NgIf,
     NgForOf,

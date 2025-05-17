@@ -24,6 +24,7 @@ export interface UserUpdateData {
   username?: string;
   email?: string;
   password?: string;
+  current_password?: string;
 }
 
 export interface RegisterData {

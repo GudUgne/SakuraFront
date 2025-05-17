@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-lessons',
+  standalone: true,
   imports: [MATERIAL_IMPORTS, MatchKanjiGeneratorComponent, FormsModule],
   templateUrl: './lessons.component.html',
   styleUrl: './lessons.component.css'

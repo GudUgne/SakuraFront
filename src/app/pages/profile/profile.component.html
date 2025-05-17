@@ -1,143 +1,191 @@
-<ng-container *ngIf="user">
-  <div class="container">
-    <h2>Profile Information</h2>
-    <mat-card>
-      <mat-card-title>Account Details</mat-card-title>
-      <mat-list>
+<div class="profile-container" *ngIf="user">
+  <h2>Profile Information</h2>
 
-        <!-- First Name -->
-        <mat-list-item>
-          <div class="profile-field">
-          <strong>First Name:</strong>
-          <ng-container *ngIf="!editMode.first_name; else editFirstName">
-            {{ user.first_name }}
-            <button mat-icon-button (click)="startEdit('first_name')">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </ng-container>
-          <ng-template #editFirstName>
-            <mat-form-field appearance="outline">
-              <input matInput [formControl]="firstNameControl">
-            </mat-form-field>
-            <button mat-icon-button color="primary" (click)="confirmEdit('first_name')">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="cancelEdit('first_name')">
-              <mat-icon>close</mat-icon>
-            </button>
-          </ng-template>
-          </div>
-        </mat-list-item>
+  <mat-card class="profile-card">
+    <mat-card-title>Account Details</mat-card-title>
+    <mat-card-content>
 
-        <!-- Last Name -->
-        <mat-list-item>
-          <div class="profile-field">
-          <strong>Last Name:</strong>
-          <ng-container *ngIf="!editMode.last_name; else editLastName">
-            {{ user.last_name }}
-            <button mat-icon-button (click)="startEdit('last_name')">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </ng-container>
-          <ng-template #editLastName>
-            <mat-form-field appearance="outline">
-              <input matInput [formControl]="lastNameControl">
-            </mat-form-field>
-            <button mat-icon-button color="primary" (click)="confirmEdit('last_name')">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="cancelEdit('last_name')">
-              <mat-icon>close</mat-icon>
-            </button>
-          </ng-template>
-          </div>
-        </mat-list-item>
+      <!-- First Name -->
+      <div class="profile-field">
+        <span class="field-label">First Name:</span>
+        <ng-container *ngIf="!editMode.first_name; else editFirstName">
+          <span class="field-value">{{ user.first_name }}</span>
+          <button mat-icon-button (click)="startEdit('first_name')" color="primary">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #editFirstName>
+          <mat-form-field appearance="outline" class="edit-field">
+            <input matInput [formControl]="firstNameControl" placeholder="First Name">
+            <mat-error *ngIf="firstNameControl.invalid">
+              {{ getErrorMessage('first_name') }}
+            </mat-error>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="confirmEdit('first_name')"
+                  [disabled]="firstNameControl.invalid">
+            <mat-icon>check</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="cancelEdit('first_name')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </ng-template>
+      </div>
 
-        <!-- Username -->
-        <mat-list-item>
-          <div class="profile-field">
-          <strong>Username:</strong>
-          <ng-container *ngIf="!editMode.username; else editUsername">
-            {{ user.username }}
-            <button mat-icon-button (click)="startEdit('username')">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </ng-container>
-          <ng-template #editUsername>
-            <mat-form-field appearance="outline">
-              <input matInput [formControl]="usernameControl">
-            </mat-form-field>
-            <button mat-icon-button color="primary" (click)="confirmEdit('username')">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="cancelEdit('username')">
-              <mat-icon>close</mat-icon>
-            </button>
-          </ng-template>
-          </div>
-        </mat-list-item>
+      <mat-divider></mat-divider>
 
-        <!-- Email -->
-        <mat-list-item>
-          <div class="profile-field">
-          <strong>Email:</strong>
-          <ng-container *ngIf="!editMode.email; else editEmail">
-            {{ user.email }}
-            <button mat-icon-button (click)="startEdit('email')">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </ng-container>
-          <ng-template #editEmail>
-            <mat-form-field appearance="outline">
-              <input matInput [formControl]="emailControl">
-            </mat-form-field>
-            <button mat-icon-button color="primary" (click)="confirmEdit('email')">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="cancelEdit('email')">
-              <mat-icon>close</mat-icon>
-            </button>
-          </ng-template>
-          </div>
-        </mat-list-item>
+      <!-- Last Name -->
+      <div class="profile-field">
+        <span class="field-label">Last Name:</span>
+        <ng-container *ngIf="!editMode.last_name; else editLastName">
+          <span class="field-value">{{ user.last_name }}</span>
+          <button mat-icon-button (click)="startEdit('last_name')" color="primary">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #editLastName>
+          <mat-form-field appearance="outline" class="edit-field">
+            <input matInput [formControl]="lastNameControl" placeholder="Last Name">
+            <mat-error *ngIf="lastNameControl.invalid">
+              {{ getErrorMessage('last_name') }}
+            </mat-error>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="confirmEdit('last_name')"
+                  [disabled]="lastNameControl.invalid">
+            <mat-icon>check</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="cancelEdit('last_name')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </ng-template>
+      </div>
 
-        <!-- Occupation (non-editable) -->
-        <mat-list-item>
-          <div class="profile-field">
-          <strong>Occupation:</strong> {{ getOccupation() }}
-          </div>
-        </mat-list-item>
+      <mat-divider></mat-divider>
 
-        <div class="password-section">
-          <mat-divider></mat-divider>
+      <!-- Username -->
+      <div class="profile-field">
+        <span class="field-label">Username:</span>
+        <ng-container *ngIf="!editMode.username; else editUsername">
+          <span class="field-value">{{ user.username }}</span>
+          <button mat-icon-button (click)="startEdit('username')" color="primary">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #editUsername>
+          <mat-form-field appearance="outline" class="edit-field">
+            <input matInput [formControl]="usernameControl" placeholder="Username">
+            <mat-error *ngIf="usernameControl.invalid">
+              {{ getErrorMessage('username') }}
+            </mat-error>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="confirmEdit('username')"
+                  [disabled]="usernameControl.invalid">
+            <mat-icon>check</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="cancelEdit('username')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </ng-template>
+      </div>
 
-          <mat-card-title class="section-title">Change Password</mat-card-title>
+      <mat-divider></mat-divider>
 
-          <mat-list-item>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>New Password</mat-label>
-              <input matInput type="password" formControlName="new_password">
-            </mat-form-field>
-          </mat-list-item>
+      <!-- Email -->
+      <div class="profile-field">
+        <span class="field-label">Email:</span>
+        <ng-container *ngIf="!editMode.email; else editEmail">
+          <span class="field-value">{{ user.email }}</span>
+          <button mat-icon-button (click)="startEdit('email')" color="primary">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #editEmail>
+          <mat-form-field appearance="outline" class="edit-field">
+            <input matInput [formControl]="emailControl" placeholder="Email" type="email">
+            <mat-error *ngIf="emailControl.invalid">
+              {{ getErrorMessage('email') }}
+            </mat-error>
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="confirmEdit('email')"
+                  [disabled]="emailControl.invalid">
+            <mat-icon>check</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="cancelEdit('email')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </ng-template>
+      </div>
 
-          <mat-list-item>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Repeat Password</mat-label>
-              <input matInput type="password" formControlName="repeat_password">
-            </mat-form-field>
-          </mat-list-item>
+      <mat-divider></mat-divider>
 
-          <mat-list-item>
-            <button mat-raised-button color="primary" (click)="changePassword()">Update Password</button>
-          </mat-list-item>
-        </div>
-      </mat-list>
-    </mat-card>
+      <!-- Occupation (non-editable) -->
+      <div class="profile-field">
+        <span class="field-label">Occupation:</span>
+        <span class="field-value">{{ getOccupation() }}</span>
+      </div>
 
-    <mat-card *ngIf="message">
-      <mat-card-content>
-        {{ message }}
-      </mat-card-content>
-    </mat-card>
-  </div>
-</ng-container>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Password Change Section -->
+  <mat-card class="password-card">
+    <mat-card-title>Change Password</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="form" class="password-form">
+
+        <!-- Current Password -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Current Password</mat-label>
+          <input matInput [type]="showCurrentPassword ? 'text' : 'password'"
+                 formControlName="current_password">
+          <button mat-icon-button matSuffix (click)="showCurrentPassword = !showCurrentPassword">
+            <mat-icon>{{ showCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="currentPasswordControl.invalid">
+            {{ getErrorMessage('current_password') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- New Password -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>New Password</mat-label>
+          <input matInput [type]="showNewPassword ? 'text' : 'password'"
+                 formControlName="new_password">
+          <button mat-icon-button matSuffix (click)="showNewPassword = !showNewPassword">
+            <mat-icon>{{ showNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="newPasswordControl.invalid">
+            {{ getErrorMessage('new_password') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Repeat Password -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Repeat New Password</mat-label>
+          <input matInput [type]="showRepeatPassword ? 'text' : 'password'"
+                 formControlName="repeat_password">
+          <button mat-icon-button matSuffix (click)="showRepeatPassword = !showRepeatPassword">
+            <mat-icon>{{ showRepeatPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="repeatPasswordControl.invalid">
+            {{ getErrorMessage('repeat_password') }}
+          </mat-error>
+          <mat-error *ngIf="form.hasError('passwordMismatch')">
+            Passwords do not match
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="changePassword()"
+                [disabled]="currentPasswordControl.invalid || newPasswordControl.invalid || repeatPasswordControl.invalid || form.hasError('passwordMismatch')">
+          Update Password
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="!user">
+  <mat-spinner></mat-spinner>
+  <p>Loading profile...</p>
+</div>
