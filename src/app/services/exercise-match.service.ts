@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {forkJoin, Observable} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
 export interface ExerciseMatch {
   id?: number;
@@ -19,30 +19,49 @@ export interface ExerciseMatchOption {
   providedIn: 'root'
 })
 export class ExerciseMatchService {
-  private baseUrl = 'http://127.0.0.1:8000/api/';
-  private matchUrl = this.baseUrl + 'exercise-match/';
-  private optionsUrl = this.baseUrl + 'exercise-match-options/';
+  private apiUrl = 'http://127.0.0.1:8000/api/exercise-match/';
+  private optionsUrl = 'http://127.0.0.1:8000/api/exercise-match-options/';
 
   constructor(private http: HttpClient) {}
 
-  // Save one kanji–meaning pair
-  // addMatch(match: ExerciseMatch): Observable<ExerciseMatch> {
-  //   return this.http.post<ExerciseMatch>(this.matchUrl);
-  // }
-
-  // Get all pairs from backend
   getMatches(): Observable<ExerciseMatch[]> {
-    return this.http.get<ExerciseMatch[]>(this.matchUrl);
+    return this.http.get<ExerciseMatch[]>(this.apiUrl);
   }
 
+  // Add a single match
+  addMatch(match: ExerciseMatch): Observable<ExerciseMatch> {
+    return this.http.post<ExerciseMatch>(this.apiUrl, match);
+  }
+
+  // Delete a match by ID
+  deleteMatch(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}${id}/`);
+  }
+
+  // Get all match options
   getMatchOptions(): Observable<ExerciseMatchOption[]> {
     return this.http.get<ExerciseMatchOption[]>(this.optionsUrl);
   }
 
+  // Add a single match option
+  addMatchOption(option: ExerciseMatchOption): Observable<ExerciseMatchOption> {
+    return this.http.post<ExerciseMatchOption>(this.optionsUrl, option);
+  }
+
+  // Delete a match option by ID
+  deleteMatchOption(id: number): Observable<any> {
+    return this.http.delete(`${this.optionsUrl}${id}/`);
+  }
+
+  // Create match with multiple options in one operation
   createMatchWithOptions(jlptLevel: number, pairs: {kanji: string, answer: string}[]): Observable<any> {
     // First create the match
-    return this.http.post<ExerciseMatch>(this.matchUrl, { jlpt_level: jlptLevel }).pipe(
+    return this.http.post<ExerciseMatch>(this.apiUrl, { jlpt_level: jlptLevel }).pipe(
       switchMap(match => {
+        if (pairs.length === 0) {
+          return forkJoin([]); // No options to create
+        }
+
         // Then create all the options for this match
         const optionRequests = pairs.map(pair => {
           const option: ExerciseMatchOption = {
@@ -50,7 +69,7 @@ export class ExerciseMatchService {
             kanji: pair.kanji,
             answer: pair.answer
           };
-          return this.http.post<ExerciseMatchOption>(this.optionsUrl, option);
+          return this.addMatchOption(option);
         });
 
         return forkJoin(optionRequests);
@@ -58,7 +77,7 @@ export class ExerciseMatchService {
     );
   }
 
-  // Check if a match already exists
+  // Check if a pair already exists in any match option
   isPairDuplicate(kanji: string, answer: string): Observable<boolean> {
     return this.getMatchOptions().pipe(
       map(options => {
@@ -68,10 +87,5 @@ export class ExerciseMatchService {
         );
       })
     );
-  }
-
-  // Delete a match by ID
-  deleteMatch(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}${id}/`);
   }
 }

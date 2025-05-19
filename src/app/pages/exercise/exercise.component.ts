@@ -6,7 +6,7 @@ import { MATERIAL_IMPORTS } from '../../material.shared';
 import { AuthService } from '../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
-import { ExerciseMatchService, ExerciseMatch } from '../../services/exercise-match.service';
+import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../services/exercise-match.service';
 
 @Component({
   selector: 'app-exercise',
@@ -45,7 +45,6 @@ export class ExerciseComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private http: HttpClient,
     private exerciseMatchService: ExerciseMatchService
   ) {}
 
@@ -59,20 +58,20 @@ export class ExerciseComponent implements OnInit {
         console.warn('Only teachers can create exercises');
       } else {
         // Load existing matches for duplication checking
-        this.loadExistingMatches();
+        this.loadExistingMatchOptions();
       }
     });
   }
 
-  loadExistingMatches(): void {
-    this.exerciseMatchService.getMatches().subscribe({
-      next: (matches) => {
+  loadExistingMatchOptions(): void {
+    this.exerciseMatchService.getMatchOptions().subscribe({
+      next: (options) => {
         this.existingMatches.clear();
-        matches.forEach(match => {
-          this.existingMatches.add(`${match.kanji}|${match.answer.toLowerCase()}`);
+        options.forEach(option => {
+          this.existingMatches.add(`${option.kanji}|${option.answer.toLowerCase()}`);
         });
       },
-      error: (err) => console.error('Failed to load existing matches', err)
+      error: (err) => console.error('Failed to load existing match options', err)
     });
   }
 
@@ -120,32 +119,19 @@ export class ExerciseComponent implements OnInit {
       return;
     }
 
-    // Create an array of observables for each pair to save
-    const saveRequests: Observable<any>[] = [];
-
-    // Prepare save requests for each pair
-    this.matchPairs.forEach(pair => {
-      const matchData: ExerciseMatch = {
-        jlpt_level: this.selectedJlptLevel,
-        kanji: pair.kanji,
-        answer: pair.answer
-      };
-
-      saveRequests.push(
-        this.exerciseMatchService.addMatch(matchData)
-      );
-    });
-
-    // Execute all save requests in parallel
-    forkJoin(saveRequests).subscribe({
-      next: (responses) => {
-        alert(`Successfully saved ${responses.length} matching pairs!`);
+    // Use the service method to create a match with its options
+    this.exerciseMatchService.createMatchWithOptions(
+      this.selectedJlptLevel,
+      this.matchPairs
+    ).subscribe({
+      next: (response) => {
+        alert(`Successfully saved ${this.matchPairs.length} matching pairs!`);
         this.matchPairs = []; // Clear the list
-        this.loadExistingMatches(); // Refresh the existing matches list
+        this.loadExistingMatchOptions(); // Refresh the existing matches list
       },
       error: (err) => {
         console.error('Error saving match pairs', err);
-        alert('Failed to save some or all match pairs. Please try again.');
+        alert('Failed to save pairs. Please try again.');
       }
     });
   }
