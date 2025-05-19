@@ -22,18 +22,6 @@ export class ChatListComponent implements OnInit {
     this.loadUsers();
   }
 
-  // loadUsers(): void {
-  //   this.http.get<any[]>(`${this.baseUrl}users/`).subscribe({
-  //     next: (data) => {
-  //       this.users = data.filter(user => user.id !== this.myUserId);
-  //       // TODO: fetch last messages if available
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading users', error);
-  //     }
-  //   });
-  // }
-
   loadUsers(): void {
     this.http.get<any[]>(`${this.baseUrl}messages/conversation/?user1=${this.myUserId}`).subscribe({
       next: (messages) => {

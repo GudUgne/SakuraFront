@@ -1,0 +1,23 @@
+<div *ngIf="loading" class="spinner-container">
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+</div>
+
+<mat-card *ngIf="!loading && group">
+  <mat-card-title>{{ group.name }} — Enrolled Students</mat-card-title>
+  <mat-list>
+    <mat-list-item *ngFor="let s of approvedStudents">
+      {{ s.first_name }} {{ s.last_name }}
+      <!-- Optional: teacher remove button -->
+      <button
+        mat-icon-button
+        color="warn"
+        (click)="removeStudent(s.id)"
+      >
+        <mat-icon>remove_circle</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+
+  <!-- Back to overview -->
+  <button mat-button routerLink="/app/studygroups">Back to Overview</button>
+</mat-card>

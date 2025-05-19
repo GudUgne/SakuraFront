@@ -4,8 +4,9 @@ import { AuthService} from '../../services/auth.service';
 import {NgForOf, NgIf} from '@angular/common';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MATERIAL_IMPORTS} from '../../material.shared';
-import {debounceTime, distinctUntilChanged} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter} from 'rxjs';
 import {MatListOption, MatSelectionList} from '@angular/material/list';
+import {RouterLink} from '@angular/router';
 
 
 @Component({
@@ -21,6 +22,7 @@ import {MatListOption, MatSelectionList} from '@angular/material/list';
     MatSelectionList,
     MatListOption,
     ReactiveFormsModule,
+    RouterLink,
   ]
 })
 export class StudyGroupsComponent implements OnInit {
@@ -34,8 +36,10 @@ export class StudyGroupsComponent implements OnInit {
   newGroupName = '';
   groupNameInput = '';
 
-  searchResults: any[] = []; // New array to store search results
+  searchResults: any[] = [];
   searchControl = new FormControl('');
+  selectedGroup: any = null;
+  preventNextSearch = false;
 
   constructor(
     private groupsService: GroupsService,
@@ -72,16 +76,16 @@ export class StudyGroupsComponent implements OnInit {
     });
 
     this.searchControl.valueChanges.pipe(
-      debounceTime(300), // Delay by 300ms to avoid too many requests
-      distinctUntilChanged() // Only emit when the current value is different from the last
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(() => !this.preventNextSearch) // Only proceed if we're not preventing search
     ).subscribe(value => {
-      if (value && value.length > 2) { // Only search when at least 3 characters
+      if (value && value.length > 2) {
         this.searchGroups(value);
       } else {
         this.searchResults = [];
       }
     });
-
   }
 
   searchGroups(query: string): void {
@@ -105,11 +109,19 @@ export class StudyGroupsComponent implements OnInit {
   }
 
   selectGroup(group: any): void {
-    this.groupNameInput = group.name;
-    this.searchControl.setValue(group.name);
-    this.searchResults = []; // Clear results after selection
-  }
+    this.selectedGroup = group;
+    this.preventNextSearch = true; // Prevent the next search
 
+    // Update form control without triggering valueChanges
+    this.groupNameInput = group.name;
+    this.searchControl.setValue(group.name, { emitEvent: false });
+    this.searchResults = []; // Clear results after selection
+
+    // Reset the prevent flag after a short delay to allow for future searches
+    setTimeout(() => {
+      this.preventNextSearch = false;
+    }, 100);
+  }
 
   createGroup(): void {
     if (!this.newGroupName) return;
@@ -122,6 +134,12 @@ export class StudyGroupsComponent implements OnInit {
   requestJoin(): void {
     if (!this.groupNameInput.trim()) {
       alert('Please enter a group name');
+      return;
+    }
+
+    // If a group was selected from the dropdown, use that directly
+    if (this.selectedGroup) {
+      this.processJoinRequest(this.selectedGroup.id);
       return;
     }
 
@@ -165,6 +183,9 @@ export class StudyGroupsComponent implements OnInit {
       next: () => {
         alert('Request sent!');
         this.groupNameInput = '';
+        this.selectedGroup = null;
+        this.searchControl.setValue('', { emitEvent: false });
+
         // Refresh pending requests
         this.groupsService.getStudentPendingRequests().subscribe((res) => {
           this.studentPendingRequests = res.filter(r => !r.verification_status);
