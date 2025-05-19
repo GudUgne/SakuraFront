@@ -1,0 +1,96 @@
+.exercise-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.warning-card {
+  margin-top: 16px;
+  background-color: #fff8e1;
+}
+
+.exercise-form-container {
+  padding: 24px;
+  max-width: 800px;
+}
+
+.pair-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.pair-inputs mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.pairs-list {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fafafa;
+  padding: 16px;
+}
+
+.pair-item {
+  border-bottom: 1px solid #e0e0e0;
+  height: auto !important;
+  margin-bottom: 8px;
+}
+
+.pair-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.pair-text {
+  font-size: 1.1rem;
+}
+
+.action-buttons {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.option-input {
+  flex: 1;
+}
+
+mat-checkbox {
+  margin-right: 16px;
+}
+
+h3 {
+  margin-bottom: 24px;
+  color: #333;
+}
+
+h4 {
+  color: #555;
+  margin-bottom: 16px;
+}

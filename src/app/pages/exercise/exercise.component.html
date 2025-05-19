@@ -1,1 +1,143 @@
-<p>exercise works!</p>
+<div class="exercise-container">
+  <h2>Exercise Creation</h2>
+
+  <!-- Not a teacher message -->
+  <mat-card *ngIf="!isTeacher" class="warning-card">
+    <mat-card-content>
+      <p>Only teachers can create exercises. Please contact an administrator if you need access.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Teacher interface -->
+  <div *ngIf="isTeacher">
+    <mat-tab-group>
+      <!-- Matching Pairs Tab -->
+      <mat-tab label="Matching Pairs">
+        <div class="exercise-form-container">
+          <h3>Create Matching Pairs Exercise</h3>
+
+          <mat-form-field appearance="fill">
+            <mat-label>JLPT Level</mat-label>
+            <mat-select [(ngModel)]="selectedJlptLevel">
+              <mat-option *ngFor="let level of jlptLevels" [value]="level">
+                N{{ level }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="pair-inputs">
+            <mat-form-field appearance="fill">
+              <mat-label>First Item (e.g., Kanji)</mat-label>
+              <input matInput [(ngModel)]="newPair.kanji" placeholder="例えば：漢字">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Second Item (e.g., Meaning)</mat-label>
+              <input matInput [(ngModel)]="newPair.answer" placeholder="For example: meaning">
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" (click)="addMatchPair()">
+              <mat-icon>add</mat-icon> Add Pair
+            </button>
+          </div>
+
+          <!-- List of added pairs -->
+          <div *ngIf="matchPairs.length > 0" class="pairs-list">
+            <h4>Added Pairs:</h4>
+            <mat-list>
+              <mat-list-item *ngFor="let pair of matchPairs; let i = index" class="pair-item">
+                <div class="pair-content">
+                  <span class="pair-text">{{ pair.kanji }} — {{ pair.answer }}</span>
+                  <button mat-icon-button color="warn" (click)="removeMatchPair(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </mat-list-item>
+            </mat-list>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              mat-raised-button
+              color="accent"
+              [disabled]="matchPairs.length === 0"
+              (click)="saveMatchPairs()">
+              Save {{ matchPairs.length }} Pair{{ matchPairs.length !== 1 ? 's' : '' }}
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Multiple Choice Tab -->
+      <mat-tab label="Multiple Choice">
+        <div class="exercise-form-container">
+          <h3>Create Multiple Choice Exercise</h3>
+
+          <mat-form-field appearance="fill">
+            <mat-label>JLPT Level</mat-label>
+            <mat-select [(ngModel)]="selectedJlptLevel">
+              <mat-option *ngFor="let level of jlptLevels" [value]="level">
+                N{{ level }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Question</mat-label>
+            <textarea matInput [(ngModel)]="multiChoiceQuestion" rows="3" placeholder="Enter your question here..."></textarea>
+          </mat-form-field>
+
+          <h4>Options:</h4>
+          <div class="options-list">
+            <div *ngFor="let option of multiChoiceOptions; let i = index" class="option-item">
+              <mat-form-field appearance="fill" class="option-input">
+                <mat-label>Option {{ i + 1 }}</mat-label>
+                <input matInput [(ngModel)]="option.text" placeholder="Enter option text">
+              </mat-form-field>
+
+              <mat-checkbox
+                [checked]="option.isCorrect"
+                (change)="setCorrectOption(i)"
+                color="primary">
+                Correct
+              </mat-checkbox>
+
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="removeOption(i)"
+                [disabled]="multiChoiceOptions.length <= 2">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              mat-button
+              color="primary"
+              (click)="addOption()"
+              [disabled]="multiChoiceOptions.length >= 6">
+              <mat-icon>add</mat-icon> Add Option
+            </button>
+
+            <button
+              mat-raised-button
+              color="accent"
+              (click)="saveMultiChoice()">
+              Save Multiple Choice
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Free Text Tab (Placeholder for future implementation) -->
+      <mat-tab label="Free Text">
+        <div class="exercise-form-container">
+          <h3>Create Free Text Exercise</h3>
+          <p>This feature will be available soon!</p>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

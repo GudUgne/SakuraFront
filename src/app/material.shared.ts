@@ -26,6 +26,7 @@ import {
 import {MatCheckbox} from '@angular/material/checkbox';
 import {MatDivider} from '@angular/material/divider';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
 
 export const MATERIAL_IMPORTS = [
   MatSidenavModule,
@@ -39,7 +40,7 @@ export const MATERIAL_IMPORTS = [
   MatOption, MatSelect, MatFormField,
   MatProgressSpinner, MatError,MatInput,
   MatRadioButton,MatList,
-  MatCell, MatCellDef,
+  MatCell, MatCellDef, MatTab, MatTabGroup,
   MatColumnDef,
   MatHeaderCell, MatHeaderCellDef,
   MatHeaderRow,

@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';  // ← for routerLink on Back button
 import {GroupDetail, GroupsService, Student} from '../../services/groups.service';
 import {MATERIAL_IMPORTS} from '../../material.shared';
+import {ChatWindowComponent} from '../../components/chat-window/chat-window.component';
 
 
 @Component({
@@ -15,6 +16,7 @@ import {MATERIAL_IMPORTS} from '../../material.shared';
     NgForOf,
     RouterModule,
     MATERIAL_IMPORTS,
+    ChatWindowComponent,
   ],
   templateUrl: './group-detail.component.html',
   styleUrls: ['./group-detail.component.css']
@@ -23,6 +25,7 @@ export class GroupDetailComponent implements OnInit {
   group?: GroupDetail;
   approvedStudents: Student[] = [];
   loading = true;
+  myUserId: number = Number(localStorage.getItem('user_id') || 0);
 
   constructor(
     private route: ActivatedRoute,
