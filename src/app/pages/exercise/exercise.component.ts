@@ -5,7 +5,6 @@ import { MATERIAL_IMPORTS } from '../../material.shared';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../services/exercise-match.service';
-import { forkJoin, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-exercise',
@@ -61,6 +60,7 @@ export class ExerciseComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMatchingExercises();
+    this.loadMatchOptions();
     this.loadMultiChoiceQuestions();
   }
 
@@ -71,22 +71,28 @@ export class ExerciseComponent implements OnInit {
     this.matchService.getMatches().subscribe({
       next: (matches) => {
         this.matchingExercises = matches;
-
-        // Store both directions of each pair to prevent duplicates
-        matches.forEach(match => {
-          if (match.kanji && match.answer) {
-            const normalizedAnswer = match.answer.toLowerCase();
-            const normalizedKanji = match.kanji.toLowerCase();
-            this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
-            this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
-          }
-        });
-
         this.loadingMatches = false;
       },
       error: (err) => {
         console.error('Error loading matching exercises:', err);
         this.loadingMatches = false;
+      }
+    });
+  }
+
+  loadMatchOptions(): void {
+    this.matchService.getAllMatchOptions().subscribe({
+      next: (options) => {
+        // Store both directions of each pair to prevent duplicates
+        options.forEach(option => {
+          const normalizedAnswer = option.answer.toLowerCase();
+          const normalizedKanji = option.kanji.toLowerCase();
+          this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
+          this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
+        });
+      },
+      error: (err) => {
+        console.error('Error loading match options:', err);
       }
     });
   }
@@ -111,28 +117,42 @@ export class ExerciseComponent implements OnInit {
       return;
     }
 
-    const newEntry: ExerciseMatch = {
-      kanji: this.newKanji,
-      answer: this.newMeaning,
+    // Create the parent match
+    const newMatch: ExerciseMatch = {
       jlpt_level: this.jlptLevel
     };
 
-    this.matchService.addMatch(newEntry).subscribe({
-      next: () => {
-        // Add both directions to prevent future duplicates
-        const normalizedAnswer = this.newMeaning.toLowerCase();
-        const normalizedKanji = this.newKanji.toLowerCase();
-        this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
-        this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
+    this.matchService.addMatch(newMatch).subscribe({
+      next: (createdMatch) => {
+        // Now create the option
+        const newOption: ExerciseMatchOption = {
+          exercise_match: createdMatch.id!,
+          kanji: this.newKanji,
+          answer: this.newMeaning
+        };
 
-        // Reset form
-        this.newKanji = '';
-        this.newMeaning = '';
+        this.matchService.addMatchOption(newOption).subscribe({
+          next: () => {
+            // Add both directions to prevent future duplicates
+            const normalizedAnswer = this.newMeaning.toLowerCase();
+            const normalizedKanji = this.newKanji.toLowerCase();
+            this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
+            this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
 
-        // Refresh list
-        this.loadMatchingExercises();
+            // Reset form
+            this.newKanji = '';
+            this.newMeaning = '';
 
-        alert('Match saved successfully');
+            // Refresh list
+            this.loadMatchingExercises();
+
+            alert('Match saved successfully');
+          },
+          error: (err) => {
+            console.error('Error saving match option:', err);
+            alert('Error saving match option');
+          }
+        });
       },
       error: (err) => {
         console.error('Error saving match:', err);
