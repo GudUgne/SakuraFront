@@ -1,182 +1,277 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MATERIAL_IMPORTS } from '../../material.shared';
-import { AuthService } from '../../services/auth.service';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable } from 'rxjs';
+import { MATERIAL_IMPORTS } from '../../material.shared';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../services/exercise-match.service';
+import { forkJoin, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-exercise',
+  templateUrl: './exercise.component.html',
+  styleUrls: ['./exercise.component.css'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatTabsModule,
     MATERIAL_IMPORTS
-  ],
-  templateUrl: './exercise.component.html',
-  styleUrl: './exercise.component.css'
+  ]
 })
 export class ExerciseComponent implements OnInit {
-  // User info
-  isTeacher = false;
+  // Matching exercise variables
+  matchingExercises: ExerciseMatch[] = [];
+  loadingMatches = false;
 
-  // Common
-  jlptLevels = [1, 2, 3, 4, 5];
-  selectedJlptLevel = 5;
+  // For matching input fields
+  newKanji = '';
+  newMeaning = '';
+  jlptLevel = 5;
 
-  // Matching pairs
-  matchPairs: { kanji: string, answer: string }[] = [];
-  newPair = { kanji: '', answer: '' };
-  existingMatches: Set<string> = new Set();
+  // To track existing pairs for duplicate prevention
+  existingPairs: Set<string> = new Set();
 
-  // Multiple choice
-  multiChoiceQuestion = '';
-  multiChoiceOptions: { text: string, isCorrect: boolean }[] = [
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false }
-  ];
+  // Multiple choice variables
+  multiChoiceForm: FormGroup;
+  submittingQuestion = false;
+  questionSuccess = false;
+  questionError = false;
+  errorMessage = '';
+  multiChoiceQuestions: any[] = [];
+  loadingQuestions = false;
 
   constructor(
-    private authService: AuthService,
-    private exerciseMatchService: ExerciseMatchService
-  ) {}
+    private matchService: ExerciseMatchService,
+    private fb: FormBuilder,
+    private http: HttpClient
+  ) {
+    // Initialize multiple choice form
+    this.multiChoiceForm = this.fb.group({
+      question: ['', Validators.required],
+      jlpt_level: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
+      options: this.fb.array([])
+    });
+
+    // Add default 4 options
+    for (let i = 0; i < 4; i++) {
+      this.addOption();
+    }
+  }
 
   ngOnInit(): void {
-    // Check if user is a teacher
-    this.authService.getCurrentUser().subscribe(user => {
-      this.isTeacher = user.is_teacher;
-
-      // If not a teacher, we could redirect or show a message
-      if (!this.isTeacher) {
-        console.warn('Only teachers can create exercises');
-      } else {
-        // Load existing matches for duplication checking
-        this.loadExistingMatchOptions();
-      }
-    });
+    this.loadMatchingExercises();
+    this.loadMultiChoiceQuestions();
   }
 
-  loadExistingMatchOptions(): void {
-    this.exerciseMatchService.getMatchOptions().subscribe({
-      next: (options) => {
-        this.existingMatches.clear();
-        options.forEach(option => {
-          this.existingMatches.add(`${option.kanji}|${option.answer.toLowerCase()}`);
+  // MATCHING EXERCISES METHODS
+
+  loadMatchingExercises(): void {
+    this.loadingMatches = true;
+    this.matchService.getMatches().subscribe({
+      next: (matches) => {
+        this.matchingExercises = matches;
+
+        // Store both directions of each pair to prevent duplicates
+        matches.forEach(match => {
+          if (match.kanji && match.answer) {
+            const normalizedAnswer = match.answer.toLowerCase();
+            const normalizedKanji = match.kanji.toLowerCase();
+            this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
+            this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
+          }
         });
-      },
-      error: (err) => console.error('Failed to load existing match options', err)
-    });
-  }
 
-  addMatchPair(): void {
-    if (!this.newPair.kanji.trim() || !this.newPair.answer.trim()) {
-      alert('Both fields are required');
-      return;
-    }
-
-    // Check for duplicates in current list
-    const isDuplicateInCurrent = this.matchPairs.some(
-      pair => pair.kanji === this.newPair.kanji &&
-        pair.answer.toLowerCase() === this.newPair.answer.toLowerCase()
-    );
-
-    if (isDuplicateInCurrent) {
-      alert('This pair already exists in your current list');
-      return;
-    }
-
-    // Check for duplicates in database
-    const key = `${this.newPair.kanji}|${this.newPair.answer.toLowerCase()}`;
-    if (this.existingMatches.has(key)) {
-      alert('This pair already exists in the database');
-      return;
-    }
-
-    // Add to current list
-    this.matchPairs.push({
-      kanji: this.newPair.kanji,
-      answer: this.newPair.answer
-    });
-
-    // Clear input fields
-    this.newPair = { kanji: '', answer: '' };
-  }
-
-  removeMatchPair(index: number): void {
-    this.matchPairs.splice(index, 1);
-  }
-
-  saveMatchPairs(): void {
-    if (this.matchPairs.length === 0) {
-      alert('Add at least one pair before saving');
-      return;
-    }
-
-    // Use the service method to create a match with its options
-    this.exerciseMatchService.createMatchWithOptions(
-      this.selectedJlptLevel,
-      this.matchPairs
-    ).subscribe({
-      next: (response) => {
-        alert(`Successfully saved ${this.matchPairs.length} matching pairs!`);
-        this.matchPairs = []; // Clear the list
-        this.loadExistingMatchOptions(); // Refresh the existing matches list
+        this.loadingMatches = false;
       },
       error: (err) => {
-        console.error('Error saving match pairs', err);
-        alert('Failed to save pairs. Please try again.');
+        console.error('Error loading matching exercises:', err);
+        this.loadingMatches = false;
       }
     });
   }
 
-  // Multiple choice methods
-  addOption(): void {
-    if (this.multiChoiceOptions.length < 6) {
-      this.multiChoiceOptions.push({ text: '', isCorrect: false });
+  // Check if a potential match would be a duplicate
+  isDuplicate(kanji: string, answer: string): boolean {
+    const normalizedAnswer = answer.toLowerCase();
+    const normalizedKanji = kanji.toLowerCase();
+    return this.existingPairs.has(`${normalizedKanji}|${normalizedAnswer}`) ||
+      this.existingPairs.has(`${normalizedAnswer}|${normalizedKanji}`);
+  }
+
+  saveMatchToDb(): void {
+    if (!this.newKanji || !this.newMeaning) {
+      alert('Please enter both kanji and meaning');
+      return;
     }
+
+    // Check if this pair or its reverse already exists
+    if (this.isDuplicate(this.newKanji, this.newMeaning)) {
+      alert(`A matching pair with kanji "${this.newKanji}" and meaning "${this.newMeaning}" already exists`);
+      return;
+    }
+
+    const newEntry: ExerciseMatch = {
+      kanji: this.newKanji,
+      answer: this.newMeaning,
+      jlpt_level: this.jlptLevel
+    };
+
+    this.matchService.addMatch(newEntry).subscribe({
+      next: () => {
+        // Add both directions to prevent future duplicates
+        const normalizedAnswer = this.newMeaning.toLowerCase();
+        const normalizedKanji = this.newKanji.toLowerCase();
+        this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
+        this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
+
+        // Reset form
+        this.newKanji = '';
+        this.newMeaning = '';
+
+        // Refresh list
+        this.loadMatchingExercises();
+
+        alert('Match saved successfully');
+      },
+      error: (err) => {
+        console.error('Error saving match:', err);
+        alert('Error saving match');
+      }
+    });
+  }
+
+  deleteMatchingExercise(id: number): void {
+    if (confirm('Are you sure you want to delete this matching exercise?')) {
+      this.matchService.deleteMatch(id).subscribe({
+        next: () => {
+          this.loadMatchingExercises();
+        },
+        error: (err) => {
+          console.error('Error deleting matching exercise:', err);
+        }
+      });
+    }
+  }
+
+  // MULTIPLE CHOICE METHODS
+
+  loadMultiChoiceQuestions(): void {
+    this.loadingQuestions = true;
+    this.http.get<any[]>('http://127.0.0.1:8000/api/exercise-multichoice/').subscribe({
+      next: (data) => {
+        this.multiChoiceQuestions = data;
+        this.loadingQuestions = false;
+      },
+      error: (err) => {
+        console.error('Error loading questions:', err);
+        this.loadingQuestions = false;
+      }
+    });
+  }
+
+  get options(): FormArray {
+    return this.multiChoiceForm.get('options') as FormArray;
+  }
+
+  addOption(): void {
+    this.options.push(this.fb.group({
+      answer: ['', Validators.required],
+      is_correct: [false]
+    }));
   }
 
   removeOption(index: number): void {
-    if (this.multiChoiceOptions.length > 2) {
-      this.multiChoiceOptions.splice(index, 1);
+    if (this.options.length > 2) { // Keep at least 2 options
+      this.options.removeAt(index);
     }
   }
 
-  setCorrectOption(index: number): void {
-    // Unselect all options
-    this.multiChoiceOptions.forEach((option, i) => {
-      option.isCorrect = (i === index);
+  submitQuestion(): void {
+    if (this.multiChoiceForm.invalid) {
+      // Mark all fields as touched to show validation errors
+      this.markFormGroupTouched(this.multiChoiceForm);
+      return;
+    }
+
+    // Check that at least one option is marked as correct
+    const anyCorrect = this.options.controls.some(control => control.get('is_correct')?.value === true);
+    if (!anyCorrect) {
+      this.errorMessage = 'At least one option must be marked as correct';
+      this.questionError = true;
+      return;
+    }
+
+    this.submittingQuestion = true;
+    this.questionError = false;
+
+    const formValue = this.multiChoiceForm.value;
+
+    // Format data for API
+    const questionData = {
+      question: formValue.question,
+      jlpt_level: formValue.jlpt_level,
+      options: formValue.options
+    };
+
+    // Send to backend API
+    this.http.post('http://127.0.0.1:8000/api/exercise-multichoice/', questionData)
+      .subscribe({
+        next: (response) => {
+          this.questionSuccess = true;
+          this.submittingQuestion = false;
+          this.resetQuestionForm();
+          this.loadMultiChoiceQuestions(); // Reload the questions list
+        },
+        error: (err) => {
+          this.questionError = true;
+          this.errorMessage = err.error?.detail || 'Failed to create question';
+          this.submittingQuestion = false;
+        }
+      });
+  }
+
+  resetQuestionForm(): void {
+    this.multiChoiceForm.reset({
+      question: '',
+      jlpt_level: 5
     });
+
+    // Reset options
+    this.options.clear();
+    for (let i = 0; i < 4; i++) {
+      this.addOption();
+    }
   }
 
-  saveMultiChoice(): void {
-    // Validation
-    if (!this.multiChoiceQuestion.trim()) {
-      alert('Please enter a question');
-      return;
+  deleteMultiChoiceQuestion(id: number): void {
+    if (confirm('Are you sure you want to delete this question?')) {
+      this.http.delete(`http://127.0.0.1:8000/api/exercise-multichoice/${id}/`).subscribe({
+        next: () => {
+          this.loadMultiChoiceQuestions();
+        },
+        error: (err) => {
+          console.error('Error deleting question:', err);
+        }
+      });
     }
+  }
 
-    // Check if at least one option is marked as correct
-    if (!this.multiChoiceOptions.some(option => option.isCorrect)) {
-      alert('Please mark at least one option as correct');
-      return;
-    }
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
 
-    // Check if all options have text
-    if (this.multiChoiceOptions.some(option => !option.text.trim())) {
-      alert('All options must have text');
-      return;
-    }
-
-    // Here we would save to the backend
-    // This would require creating a proper service and API endpoint
-    alert('Multiple choice exercise saving not yet implemented');
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      } else if (control instanceof FormArray) {
+        (control as FormArray).controls.forEach(c => {
+          if (c instanceof FormGroup) {
+            this.markFormGroupTouched(c);
+          } else {
+            c.markAsTouched();
+          }
+        });
+      }
+    });
   }
 }
