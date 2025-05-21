@@ -31,7 +31,12 @@ export const routes: Routes = [
       { path: 'characters', component: CharactersComponent },
       { path: 'lessons', component: LessonsComponent },
       { path: 'homework', component: HomeworkComponent },
-      { path: 'exercise', component: ExerciseComponent },
+      {
+        path: 'exercise',
+        component: ExerciseComponent,
+        canActivate: [AuthGuard],
+        data: { teacherOnly: true }
+      },
       { path: 'messages', component: MessagesComponent },
       { path: 'studygroups', component: StudyGroupsComponent },
       { path: 'groups/:id', component: GroupDetailComponent },

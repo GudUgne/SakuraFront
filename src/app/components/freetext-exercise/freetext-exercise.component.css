@@ -1,0 +1,91 @@
+.freetext-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.exercise-card-container {
+  margin-bottom: 2rem;
+}
+
+.exercise-card {
+  padding: 1.5rem;
+}
+
+.question-container {
+  margin-bottom: 1.5rem;
+}
+
+.question-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.answer-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.result-container {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.result mat-icon {
+  margin-right: 0.5rem;
+}
+
+.result.correct {
+  color: #4caf50;
+}
+
+.result.incorrect {
+  color: #f44336;
+}
+
+.pending {
+  display: flex;
+  align-items: center;
+  color: #ff9800;
+}
+
+.pending mat-icon {
+  margin-right: 0.5rem;
+}
+
+.feedback {
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.no-exercises {
+  text-align: center;
+  padding: 2rem;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px 16px;
+}
+
+@media (max-width: 600px) {
+  mat-card-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  mat-card-actions button {
+    flex: 1 0 calc(50% - 8px);
+  }
+}

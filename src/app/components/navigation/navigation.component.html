@@ -21,8 +21,8 @@
                            routerLinkActive="active-link">
               Characters
             </a>
-            <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="exercise"
-                           routerLinkActive="active-link">
+            <a mat-list-item *ngIf="isTeacher" [routerLinkActiveOptions]="{ exact: true }" routerLink="exercise"
+               routerLinkActive="active-link">
               Exercises
             </a>
             <a mat-list-item [routerLinkActiveOptions]="{ exact: true }" routerLink="lessons"

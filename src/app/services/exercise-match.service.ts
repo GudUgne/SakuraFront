@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of, tap, switchMap, map, forkJoin } from 'rxjs';
+import { Observable, of, switchMap, map } from 'rxjs';
 
 export interface ExerciseMatch {
   id?: number;
