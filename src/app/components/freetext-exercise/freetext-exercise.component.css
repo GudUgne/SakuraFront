@@ -1,14 +1,35 @@
-.freetext-container {
+.exercise-container {
   max-width: 800px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
-.exercise-card-container {
+.exercise-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.exercise-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.spinner {
+  margin: 2rem auto;
+}
+
+.no-exercises {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.current-exercise {
   margin-bottom: 2rem;
 }
 
-.exercise-card {
+mat-card {
   padding: 1.5rem;
 }
 
@@ -17,75 +38,76 @@
 }
 
 .question-text {
+  white-space: pre-wrap;
   font-size: 1.1rem;
   line-height: 1.6;
-  white-space: pre-wrap;
+  margin-top: 0.5rem;
+}
+
+.answer-section {
+  margin-bottom: 1.5rem;
 }
 
 .answer-field {
   width: 100%;
+}
+
+.answer-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.feedback-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.feedback-container.correct {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+}
+
+.feedback-container.incorrect {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+}
+
+.correct-answer {
+  padding: 1rem;
+  background-color: rgba(250, 250, 250, 0.7);
+  border-radius: 4px;
   margin-bottom: 1rem;
 }
 
-.result-container {
-  margin: 1rem 0;
-  padding: 1rem;
-  border-radius: 4px;
-  background-color: #f5f5f5;
-}
-
-.result {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
+.correct-answer h4 {
+  margin-top: 0;
   margin-bottom: 0.5rem;
+  color: #555;
 }
 
-.result mat-icon {
-  margin-right: 0.5rem;
-}
-
-.result.correct {
-  color: #4caf50;
-}
-
-.result.incorrect {
-  color: #f44336;
-}
-
-.pending {
-  display: flex;
-  align-items: center;
-  color: #ff9800;
-}
-
-.pending mat-icon {
-  margin-right: 0.5rem;
-}
-
-.feedback {
-  margin-top: 0.5rem;
-  font-style: italic;
-}
-
-.no-exercises {
-  text-align: center;
-  padding: 2rem;
-}
-
-mat-card-actions {
+.navigation-buttons {
   display: flex;
   justify-content: space-between;
-  padding: 0 16px 16px;
+  width: 100%;
+}
+
+.teacher-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 @media (max-width: 600px) {
-  mat-card-actions {
-    flex-wrap: wrap;
-    gap: 8px;
+  .answer-actions {
+    flex-direction: column;
   }
 
-  mat-card-actions button {
-    flex: 1 0 calc(50% - 8px);
+  .answer-actions button {
+    width: 100%;
   }
 }

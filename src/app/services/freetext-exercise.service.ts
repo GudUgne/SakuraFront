@@ -1,7 +1,13 @@
-// src/app/services/freetext-exercise.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
+
+export interface FreetextExercise {
+  id?: number;
+  question: string;
+  answer: string;
+  jlpt_level: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,41 +17,49 @@ export class FreetextExerciseService {
 
   constructor(private http: HttpClient) {}
 
-  // Exercise management
-  getExercises(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}exercise-freetext/`);
+  // Get all freetext exercises
+  getExercises(): Observable<FreetextExercise[]> {
+    return this.http.get<FreetextExercise[]>(`${this.baseUrl}exercise-freetext/`)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
-  getExerciseById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}exercise-freetext/${id}/`);
+  // Get a specific exercise by ID
+  getExercise(id: number): Observable<FreetextExercise> {
+    return this.http.get<FreetextExercise>(`${this.baseUrl}exercise-freetext/${id}/`)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
-  createExercise(exercise: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}exercise-freetext/`, exercise);
+  // Create a new exercise (teachers only)
+  createExercise(exercise: FreetextExercise): Observable<FreetextExercise> {
+    return this.http.post<FreetextExercise>(`${this.baseUrl}exercise-freetext/`, exercise)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
-  updateExercise(id: number, exercise: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}exercise-freetext/${id}/`, exercise);
+  // Update an existing exercise (teachers only)
+  updateExercise(id: number, exercise: FreetextExercise): Observable<FreetextExercise> {
+    return this.http.put<FreetextExercise>(`${this.baseUrl}exercise-freetext/${id}/`, exercise)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
-  deleteExercise(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}exercise-freetext/${id}/`);
+  // Delete an exercise (teachers only)
+  deleteExercise(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}exercise-freetext/${id}/`)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
-  // Submission management
-  submitAnswer(submission: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}freetext-submission/`, submission);
-  }
-
-  getStudentSubmissions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}freetext-submission/`);
-  }
-
-  getPendingSubmissions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}freetext-pending/`);
-  }
-
-  reviewSubmission(id: number, reviewData: any): Observable<any> {
-    return this.http.patch<any>(`${this.baseUrl}freetext-submission/${id}/`, reviewData);
+  // Generic error handler
+  private handleError(error: any) {
+    console.error('An error occurred:', error);
+    return throwError(() => error);
   }
 }

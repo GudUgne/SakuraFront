@@ -1,20 +1,45 @@
-<div class="freetext-container">
-  <mat-progress-spinner *ngIf="loading" diameter="40" style="margin: 2rem auto;"></mat-progress-spinner>
+<div class="exercise-container">
+  <h2>Freetext Exercises</h2>
 
-  <div *ngIf="!loading && exercises.length === 0" class="no-exercises">
-    <p>No freetext exercises available.</p>
-    <button mat-raised-button color="primary" routerLink="/app/exercise/create" *ngIf="isTeacher">
-      Create Exercise
+  <div class="exercise-actions" *ngIf="isTeacher">
+    <button mat-raised-button color="primary" (click)="createNewExercise()">
+      <mat-icon>add</mat-icon> Create New Exercise
     </button>
   </div>
 
-  <div *ngIf="!loading && currentExercise" class="exercise-card-container">
-    <mat-card class="exercise-card">
+  <mat-spinner *ngIf="loading" diameter="40" class="spinner"></mat-spinner>
+
+  <div *ngIf="!loading && exercises.length === 0" class="no-exercises">
+    <mat-card>
+      <mat-card-content>
+        <p>No exercises available.</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="createNewExercise()"
+          *ngIf="isTeacher"
+        >
+          Create Your First Exercise
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!loading && currentExercise" class="current-exercise">
+    <mat-card>
       <mat-card-header>
-        <mat-card-title>Freetext Exercise (JLPT N{{ currentExercise.jlpt_level }})</mat-card-title>
-        <mat-card-subtitle>
-          Exercise {{ exerciseIndex + 1 }} of {{ exercises.length }}
-        </mat-card-subtitle>
+        <mat-card-title>Exercise {{ exerciseIndex + 1 }} of {{ exercises.length }}</mat-card-title>
+        <mat-card-subtitle>JLPT N{{ currentExercise.jlpt_level }}</mat-card-subtitle>
+
+        <!-- Teacher controls -->
+        <div class="teacher-controls" *ngIf="isTeacher">
+          <button mat-icon-button color="primary" (click)="editExercise(currentExercise)" matTooltip="Edit Exercise">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteExercise(currentExercise)" matTooltip="Delete Exercise">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
@@ -23,60 +48,65 @@
           <p class="question-text">{{ currentExercise.question }}</p>
         </div>
 
-        <mat-form-field class="answer-field" appearance="outline">
-          <mat-label>Your Answer</mat-label>
-          <textarea
-            matInput
-            [(ngModel)]="userAnswer"
-            placeholder="Type your answer here..."
-            [disabled]="submitted"
-            rows="3"
-          ></textarea>
-        </mat-form-field>
+        <div class="answer-section">
+          <mat-form-field appearance="outline" class="answer-field">
+            <mat-label>Your Answer</mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="userAnswer"
+              placeholder="Type your answer here..."
+              [disabled]="showAnswer"
+              rows="3"
+            ></textarea>
+          </mat-form-field>
 
-        <div *ngIf="submitted && submissionResult" class="result-container">
-          <ng-container *ngIf="submissionResult.is_reviewed">
-            <div
-              class="result"
-              [class.correct]="submissionResult.is_correct"
-              [class.incorrect]="!submissionResult.is_correct"
+          <div class="answer-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="checkAnswer()"
+              [disabled]="!userAnswer.trim() || showAnswer"
             >
-              <mat-icon>{{ submissionResult.is_correct ? 'check_circle' : 'error' }}</mat-icon>
-              <span>{{ submissionResult.is_correct ? 'Correct!' : 'Incorrect' }}</span>
-            </div>
-            <p *ngIf="submissionResult.teacher_feedback" class="feedback">
-              <strong>Feedback:</strong> {{ submissionResult.teacher_feedback }}
-            </p>
-          </ng-container>
-          <div *ngIf="!submissionResult.is_reviewed" class="pending">
-            <mat-icon>pending</mat-icon>
-            <span>Waiting for teacher review</span>
+              Check Answer
+            </button>
+            <button
+              mat-button
+              (click)="resetExercise()"
+              *ngIf="showAnswer"
+            >
+              Try Again
+            </button>
           </div>
+        </div>
+
+        <div *ngIf="showAnswer" class="feedback-container" [ngClass]="{correct: isCorrect, incorrect: !isCorrect}">
+          <mat-icon>{{ isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+          <p>{{ feedback }}</p>
+        </div>
+
+        <div *ngIf="showAnswer" class="correct-answer">
+          <h4>Correct Answer:</h4>
+          <p>{{ currentExercise.answer }}</p>
         </div>
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-button (click)="previousExercise()" [disabled]="exercises.length <= 1">
-          <mat-icon>navigate_before</mat-icon> Previous
-        </button>
-        <button mat-button (click)="nextExercise()" [disabled]="exercises.length <= 1">
-          Next <mat-icon>navigate_next</mat-icon>
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="submitAnswer()"
-          [disabled]="!userAnswer.trim() || submitted"
-        >
-          Submit Answer
-        </button>
-        <button
-          mat-raised-button
-          (click)="resetExercise()"
-          *ngIf="submitted"
-        >
-          Try Again
-        </button>
+        <div class="navigation-buttons">
+          <button
+            mat-button
+            (click)="previousExercise()"
+            [disabled]="exercises.length <= 1"
+          >
+            <mat-icon>navigate_before</mat-icon> Previous
+          </button>
+          <button
+            mat-button
+            (click)="nextExercise()"
+            [disabled]="exercises.length <= 1"
+          >
+            Next <mat-icon>navigate_next</mat-icon>
+          </button>
+        </div>
       </mat-card-actions>
     </mat-card>
   </div>

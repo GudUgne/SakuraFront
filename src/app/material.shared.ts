@@ -10,7 +10,7 @@ import {
 } from '@angular/material/expansion';
 import {MatIcon} from '@angular/material/icon';
 import {MatActionList, MatList, MatListItem, MatNavList} from '@angular/material/list';
-import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatError, MatFormField, MatHint, MatLabel} from '@angular/material/form-field';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatInput} from '@angular/material/input';
@@ -46,6 +46,7 @@ export const MATERIAL_IMPORTS = [
   MatHeaderRow,
   MatHeaderRowDef,
   MatRow,
-  MatRowDef, MatTable, MatCheckbox, MatDivider, MatAutocompleteModule
+  MatRowDef, MatTable, MatCheckbox, MatDivider, MatAutocompleteModule,
+  MatHint,
 ];
 

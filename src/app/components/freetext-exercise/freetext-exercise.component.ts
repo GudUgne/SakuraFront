@@ -1,45 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgForOf } from '@angular/common';
+import {NgIf, NgForOf, NgClass} from '@angular/common';
+import { Router } from '@angular/router';
 import { MATERIAL_IMPORTS } from '../../material.shared';
-import { FreetextExerciseService } from '../../services/freetext-exercise.service';
+import { FreetextExerciseService, FreetextExercise } from '../../services/freetext-exercise.service';
 import { AuthService } from '../../services/auth.service';
-
-interface FreetextExercise {
-  id: number;
-  question: string;
-  jlpt_level: number;
-}
-
-interface FreetextSubmission {
-  id?: number;
-  exercise: number;
-  student_answer: string;
-  is_reviewed?: boolean;
-  is_correct?: boolean;
-  teacher_feedback?: string;
-}
 
 @Component({
   selector: 'app-freetext-exercise',
   templateUrl: './freetext-exercise.component.html',
   styleUrls: ['./freetext-exercise.component.css'],
   standalone: true,
-  imports: [MATERIAL_IMPORTS, FormsModule, NgIf, NgForOf]
+  imports: [MATERIAL_IMPORTS, FormsModule, NgIf, NgClass]
 })
 export class FreetextExerciseComponent implements OnInit {
   exercises: FreetextExercise[] = [];
   currentExercise: FreetextExercise | null = null;
   exerciseIndex = 0;
   userAnswer = '';
-  submitted = false;
-  submissionResult: any = null;
+  showAnswer = false;
+  isCorrect = false;
   isTeacher = false;
   loading = true;
+  feedback = '';
 
   constructor(
     private freetextService: FreetextExerciseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -66,42 +54,28 @@ export class FreetextExerciseComponent implements OnInit {
     });
   }
 
-  submitAnswer(): void {
+  checkAnswer(): void {
     if (!this.currentExercise) return;
 
-    const submission: FreetextSubmission = {
-      exercise: this.currentExercise.id,
-      student_answer: this.userAnswer
-    };
+    // Simple exact match (case insensitive)
+    this.isCorrect = this.userAnswer.trim().toLowerCase() ===
+      this.currentExercise.answer.trim().toLowerCase();
 
-    this.freetextService.submitAnswer(submission).subscribe({
-      next: (result) => {
-        this.submitted = true;
-        this.submissionResult = result;
-
-        // If auto-checked as correct, show feedback immediately
-        if (result.is_reviewed && result.is_correct) {
-          this.showSuccess('Correct answer! Well done.');
-        } else if (result.is_reviewed && !result.is_correct) {
-          this.showError('Incorrect answer. Try again or check the solution.');
-        } else {
-          this.showInfo('Your answer has been submitted and will be reviewed by a teacher.');
-        }
-      },
-      error: (err) => {
-        console.error('Error submitting answer:', err);
-        this.showError('Failed to submit your answer. Please try again.');
-      }
-    });
+    this.showAnswer = true;
+    this.feedback = this.isCorrect ? 'Correct! Well done.' : 'Not quite right. Check the correct answer below.';
   }
 
   nextExercise(): void {
+    if (this.exercises.length <= 1) return;
+
     this.exerciseIndex = (this.exerciseIndex + 1) % this.exercises.length;
     this.currentExercise = this.exercises[this.exerciseIndex];
     this.resetExercise();
   }
 
   previousExercise(): void {
+    if (this.exercises.length <= 1) return;
+
     this.exerciseIndex = (this.exerciseIndex - 1 + this.exercises.length) % this.exercises.length;
     this.currentExercise = this.exercises[this.exerciseIndex];
     this.resetExercise();
@@ -109,20 +83,40 @@ export class FreetextExerciseComponent implements OnInit {
 
   resetExercise(): void {
     this.userAnswer = '';
-    this.submitted = false;
-    this.submissionResult = null;
+    this.showAnswer = false;
+    this.isCorrect = false;
+    this.feedback = '';
   }
 
-  showSuccess(message: string): void {
-    // You can replace this with your preferred notification method
-    console.log('Success:', message);
+  createNewExercise(): void {
+    this.router.navigate(['/app/exercise/create']);
   }
 
-  showError(message: string): void {
-    console.error('Error:', message);
+  editExercise(exercise: FreetextExercise): void {
+    this.router.navigate(['/app/exercise/edit', exercise.id]);
   }
 
-  showInfo(message: string): void {
-    console.info('Info:', message);
+  deleteExercise(exercise: FreetextExercise): void {
+    if (!exercise.id) return;
+
+    if (confirm('Are you sure you want to delete this exercise?')) {
+      this.freetextService.deleteExercise(exercise.id).subscribe({
+        next: () => {
+          this.exercises = this.exercises.filter(ex => ex.id !== exercise.id);
+          if (this.currentExercise?.id === exercise.id) {
+            this.resetExercise();
+            if (this.exercises.length > 0) {
+              this.exerciseIndex = 0;
+              this.currentExercise = this.exercises[0];
+            } else {
+              this.currentExercise = null;
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Error deleting exercise:', err);
+        }
+      });
+    }
   }
 }

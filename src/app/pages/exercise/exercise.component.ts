@@ -5,6 +5,7 @@ import { MATERIAL_IMPORTS } from '../../material.shared';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../services/exercise-match.service';
+import {FreetextExerciseComponent} from '../../components/freetext-exercise/freetext-exercise.component';
 
 @Component({
   selector: 'app-exercise',
@@ -15,7 +16,8 @@ import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MATERIAL_IMPORTS
+    MATERIAL_IMPORTS,
+    FreetextExerciseComponent
   ]
 })
 export class ExerciseComponent implements OnInit {

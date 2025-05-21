@@ -1,0 +1,91 @@
+<div class="edit-container" *ngIf="isTeacher">
+  <h2>{{ isEditMode ? 'Edit' : 'Create' }} Freetext Exercise</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <mat-spinner *ngIf="loading" diameter="40" class="spinner"></mat-spinner>
+
+  <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()" class="exercise-form" *ngIf="!loading">
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Question</mat-label>
+          <textarea
+            matInput
+            formControlName="question"
+            placeholder="Enter the exercise question"
+            rows="3"
+            required
+          ></textarea>
+          <mat-error *ngIf="questionControl?.errors?.['required']">
+            Question is required
+          </mat-error>
+          <mat-error *ngIf="questionControl?.errors?.['minlength']">
+            Question must be at least 3 characters
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correct Answer</mat-label>
+          <textarea
+            matInput
+            formControlName="answer"
+            placeholder="Enter the correct answer"
+            rows="2"
+            required
+          ></textarea>
+          <mat-hint>Students' answers will be automatically compared to this text.</mat-hint>
+          <mat-error *ngIf="answerControl?.errors?.['required']">
+            Answer is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>JLPT Level</mat-label>
+          <mat-select formControlName="jlpt_level" required>
+            <mat-option *ngFor="let level of jlptLevels" [value]="level">
+              N{{ level }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="jlptLevelControl?.invalid">
+            JLPT level is required
+          </mat-error>
+        </mat-form-field>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="exerciseForm.invalid || submitting"
+        >
+          <mat-spinner *ngIf="submitting" diameter="20" class="button-spinner"></mat-spinner>
+          <span *ngIf="!submitting">{{ isEditMode ? 'Update' : 'Create' }} Exercise</span>
+        </button>
+        <button
+          mat-button
+          type="button"
+          routerLink="/app/exercise"
+        >
+          Cancel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>
+
+<div class="unauthorized" *ngIf="!isTeacher">
+  <mat-card>
+    <mat-card-content>
+      <p>Only teachers can {{ isEditMode ? 'edit' : 'create' }} exercises. Please contact an administrator if you believe this is an error.</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/app/exercise">
+        Back to Exercises
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
