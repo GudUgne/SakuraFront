@@ -1,233 +1,27 @@
 <div class="exercise-container">
   <h1>Exercise Management</h1>
 
-  <mat-tab-group>
-    <!-- MATCHING EXERCISES TAB -->
-    <mat-tab label="Matching Exercises">
-      <div class="tab-content">
-        <h2>Create Kanji-Meaning Matching Pairs</h2>
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading...</p>
+  </div>
 
-        <!-- Simple entry form for kanji-meaning pairs -->
-        <div class="match-form">
-          <mat-form-field appearance="fill">
-            <mat-label>Kanji</mat-label>
-            <input matInput [(ngModel)]="newKanji" placeholder="Enter kanji">
-          </mat-form-field>
+  <ng-container *ngIf="!loading">
+    <mat-tab-group>
+      <!-- MATCHING EXERCISES TAB -->
+      <mat-tab label="Matching Exercises">
+        <app-pair-match></app-pair-match>
+      </mat-tab>
 
-          <mat-form-field appearance="fill">
-            <mat-label>Meaning</mat-label>
-            <input matInput [(ngModel)]="newMeaning" placeholder="Enter meaning">
-          </mat-form-field>
+      <!-- MULTIPLE CHOICE TAB -->
+      <mat-tab label="Multiple Choice Questions">
+        <app-multi-choice></app-multi-choice>
+      </mat-tab>
 
-          <mat-form-field appearance="fill">
-            <mat-label>JLPT Level</mat-label>
-            <mat-select [(ngModel)]="jlptLevel">
-              <mat-option [value]="1">N1</mat-option>
-              <mat-option [value]="2">N2</mat-option>
-              <mat-option [value]="3">N3</mat-option>
-              <mat-option [value]="4">N4</mat-option>
-              <mat-option [value]="5">N5</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <button mat-raised-button color="primary" (click)="saveMatchToDb()">
-            Save Match
-          </button>
-        </div>
-
-        <h2>Current Matching Exercises</h2>
-
-        <div *ngIf="loadingMatches" class="loading-container">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading exercises...</p>
-        </div>
-
-        <div *ngIf="!loadingMatches && matchingExercises.length === 0" class="empty-state">
-          <p>No matching exercises available.</p>
-        </div>
-
-        <mat-table *ngIf="!loadingMatches && matchingExercises.length > 0" [dataSource]="matchingExercises" class="mat-elevation-z8">
-          <ng-container matColumnDef="kanji">
-            <mat-header-cell *matHeaderCellDef>Kanji</mat-header-cell>
-            <mat-cell *matCellDef="let match">{{ match.kanji }}</mat-cell>
-          </ng-container>
-
-          <ng-container matColumnDef="meaning">
-            <mat-header-cell *matHeaderCellDef>Meaning</mat-header-cell>
-            <mat-cell *matCellDef="let match">{{ match.answer }}</mat-cell>
-          </ng-container>
-
-          <ng-container matColumnDef="jlpt">
-            <mat-header-cell *matHeaderCellDef>JLPT Level</mat-header-cell>
-            <mat-cell *matCellDef="let match">N{{ match.jlpt_level }}</mat-cell>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-            <mat-cell *matCellDef="let match">
-              <button mat-icon-button color="warn" (click)="deleteMatchingExercise(match.id)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </mat-cell>
-          </ng-container>
-
-          <mat-header-row *matHeaderRowDef="['kanji', 'meaning', 'jlpt', 'actions']"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: ['kanji', 'meaning', 'jlpt', 'actions'];"></mat-row>
-        </mat-table>
-      </div>
-    </mat-tab>
-
-    <!-- MULTIPLE CHOICE TAB -->
-    <mat-tab label="Multiple Choice Questions">
-      <div class="tab-content">
-        <h2>Create Multiple Choice Exercise</h2>
-
-        <div *ngIf="questionSuccess" class="success-message">
-          <mat-card>
-            <mat-card-content>
-              <p>Question created successfully!</p>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-        <div *ngIf="questionError" class="error-message">
-          <mat-card>
-            <mat-card-content>
-              <p>{{ errorMessage }}</p>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-        <form [formGroup]="multiChoiceForm" (ngSubmit)="submitQuestion()">
-          <mat-card>
-            <mat-card-content>
-              <!-- Question Field -->
-              <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Question</mat-label>
-                <textarea
-                  matInput
-                  formControlName="question"
-                  placeholder="Enter your question text here"
-                  rows="3"></textarea>
-                <mat-error *ngIf="multiChoiceForm.get('question')?.errors?.['required'] && multiChoiceForm.get('question')?.touched">
-                  Question is required
-                </mat-error>
-              </mat-form-field>
-
-              <!-- JLPT Level -->
-              <mat-form-field appearance="fill">
-                <mat-label>JLPT Level</mat-label>
-                <mat-select formControlName="jlpt_level">
-                  <mat-option [value]="1">N1</mat-option>
-                  <mat-option [value]="2">N2</mat-option>
-                  <mat-option [value]="3">N3</mat-option>
-                  <mat-option [value]="4">N4</mat-option>
-                  <mat-option [value]="5">N5</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Answer Options -->
-              <div formArrayName="options" class="options-container">
-                <h3>Answer Options</h3>
-                <p class="info-text">Mark one or more options as correct answers. Each question must have at least one correct answer.</p>
-
-                <div *ngFor="let option of options.controls; let i = index" class="option-row">
-                  <div [formGroupName]="i" class="option-form-group">
-                    <mat-form-field appearance="fill" class="option-text">
-                      <mat-label>Option {{ i + 1 }}</mat-label>
-                      <input matInput formControlName="answer" placeholder="Enter answer option">
-                      <mat-error *ngIf="option.get('answer')?.errors?.['required'] && option.get('answer')?.touched">
-                        Option text is required
-                      </mat-error>
-                    </mat-form-field>
-
-                    <mat-checkbox
-                      formControlName="is_correct"
-                      color="primary"
-                      class="correct-checkbox">
-                      Correct
-                    </mat-checkbox>
-
-                    <button
-                      mat-icon-button
-                      type="button"
-                      color="warn"
-                      (click)="removeOption(i)"
-                      [disabled]="options.length <= 2"
-                      aria-label="Remove option">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  mat-stroked-button
-                  type="button"
-                  color="primary"
-                  (click)="addOption()"
-                  class="add-option-btn">
-                  <mat-icon>add</mat-icon> Add Option
-                </button>
-              </div>
-            </mat-card-content>
-
-            <mat-card-actions>
-              <button
-                mat-raised-button
-                color="primary"
-                type="submit"
-                [disabled]="submittingQuestion">
-                {{ submittingQuestion ? 'Saving...' : 'Save Question' }}
-              </button>
-              <button
-                mat-button
-                type="button"
-                (click)="resetQuestionForm()">
-                Reset
-              </button>
-            </mat-card-actions>
-          </mat-card>
-        </form>
-
-        <h2>Current Multiple Choice Questions</h2>
-
-        <div *ngIf="loadingQuestions" class="loading-container">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading questions...</p>
-        </div>
-
-        <div *ngIf="!loadingQuestions && multiChoiceQuestions.length === 0" class="empty-state">
-          <p>No multiple choice questions available.</p>
-        </div>
-
-        <div *ngIf="!loadingQuestions && multiChoiceQuestions.length > 0" class="questions-list">
-          <mat-card *ngFor="let question of multiChoiceQuestions" class="question-card">
-            <mat-card-header>
-              <mat-card-title>{{ question.question }}</mat-card-title>
-              <mat-card-subtitle>JLPT Level N{{ question.jlpt_level }}</mat-card-subtitle>
-
-              <button mat-icon-button color="warn" (click)="deleteMultiChoiceQuestion(question.id)" class="delete-question-btn">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </mat-card-header>
-
-            <mat-card-content>
-              <h4>Options:</h4>
-              <mat-list>
-                <mat-list-item *ngFor="let option of question.options" class="option-item">
-                  <span [class.correct-option]="option.is_correct">
-                    {{ option.answer }}
-                    <mat-icon *ngIf="option.is_correct" color="primary" class="correct-icon">check_circle</mat-icon>
-                  </span>
-                </mat-list-item>
-              </mat-list>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </div>
-    </mat-tab>
-    <mat-tab label="Freetext Exercises">
-      <app-freetext-exercise></app-freetext-exercise>
-    </mat-tab>
-  </mat-tab-group>
+      <!-- FREETEXT EXERCISES TAB -->
+      <mat-tab label="Freetext Exercises">
+        <app-freetext-exercise></app-freetext-exercise>
+      </mat-tab>
+    </mat-tab-group>
+  </ng-container>
 </div>

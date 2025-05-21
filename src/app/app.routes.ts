@@ -33,15 +33,12 @@ export const routes: Routes = [
       { path: 'characters', component: CharactersComponent },
       { path: 'lessons', component: LessonsComponent },
       { path: 'homework', component: HomeworkComponent },
-      // {
-      //   path: 'exercise',
-      //   component: ExerciseComponent,
-      //   canActivate: [AuthGuard],
-      //   data: { teacherOnly: true }
-      // },
-      { path: 'exercise', component: FreetextExerciseComponent },
-      { path: 'exercise/create', component: FreetextEditComponent },
-      { path: 'exercise/edit/:id', component: FreetextEditComponent },
+      {
+        path: 'exercise',
+        component: ExerciseComponent,
+        canActivate: [AuthGuard],
+        data: { teacherOnly: true }
+      },
 
       { path: 'messages', component: MessagesComponent },
       { path: 'studygroups', component: StudyGroupsComponent },

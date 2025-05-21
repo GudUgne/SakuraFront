@@ -1,0 +1,71 @@
+<div class="match-exercise-container">
+  <h2>Create Kanji-Meaning Matching Pairs</h2>
+
+  <!-- Simple entry form for kanji-meaning pairs -->
+  <div class="match-form">
+    <mat-form-field appearance="fill">
+      <mat-label>Kanji</mat-label>
+      <input matInput [(ngModel)]="newKanji" placeholder="Enter kanji">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Meaning</mat-label>
+      <input matInput [(ngModel)]="newMeaning" placeholder="Enter meaning">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>JLPT Level</mat-label>
+      <mat-select [(ngModel)]="jlptLevel">
+        <mat-option [value]="1">N1</mat-option>
+        <mat-option [value]="2">N2</mat-option>
+        <mat-option [value]="3">N3</mat-option>
+        <mat-option [value]="4">N4</mat-option>
+        <mat-option [value]="5">N5</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="saveMatchToDb()">
+      Save Match
+    </button>
+  </div>
+
+  <h2>Current Matching Exercises</h2>
+
+  <div *ngIf="loadingMatches" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading exercises...</p>
+  </div>
+
+  <div *ngIf="!loadingMatches && matchingExercises.length === 0" class="empty-state">
+    <p>No matching exercises available.</p>
+  </div>
+
+  <mat-table *ngIf="!loadingMatches && matchingExercises.length > 0" [dataSource]="matchingExercises" class="mat-elevation-z8">
+    <ng-container matColumnDef="kanji">
+      <mat-header-cell *matHeaderCellDef>Kanji</mat-header-cell>
+      <mat-cell *matCellDef="let match">{{ match.kanji }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="meaning">
+      <mat-header-cell *matHeaderCellDef>Meaning</mat-header-cell>
+      <mat-cell *matCellDef="let match">{{ match.answer }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="jlpt">
+      <mat-header-cell *matHeaderCellDef>JLPT Level</mat-header-cell>
+      <mat-cell *matCellDef="let match">N{{ match.jlpt_level }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+      <mat-cell *matCellDef="let match">
+        <button mat-icon-button color="warn" (click)="deleteMatchingExercise(match.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="['kanji', 'meaning', 'jlpt', 'actions']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['kanji', 'meaning', 'jlpt', 'actions'];"></mat-row>
+  </mat-table>
+</div>
