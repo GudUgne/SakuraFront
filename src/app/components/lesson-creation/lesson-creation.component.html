@@ -146,12 +146,15 @@
                   </div>
                 </div>
 
-                <!-- Pair-match exercise -->
+                <!-- Pair-match exercise - Show ALL pairs -->
                 <div *ngIf="exercise.type === 'pair-match'">
-                  <div class="pair-container">
-                    <span class="kanji-part">{{ exercise.kanji }}</span>
-                    <span class="arrow">↔</span>
-                    <span class="meaning-part">{{ exercise.answer }}</span>
+                  <h4 class="exercise-question">Kanji-Meaning Matching ({{ exercise.pair_count }} pairs)</h4>
+                  <div class="pairs-container">
+                    <div *ngFor="let pair of exercise.pairs" class="pair-item">
+                      <span class="kanji-part">{{ pair.kanji }}</span>
+                      <span class="arrow">↔</span>
+                      <span class="meaning-part">{{ pair.answer }}</span>
+                    </div>
                   </div>
                 </div>
               </div>

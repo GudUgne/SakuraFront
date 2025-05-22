@@ -117,14 +117,8 @@ export class LessonTakingComponent implements OnInit {
     current.isCorrect = isCorrect;
     current.showAnswer = true;
 
-    // Auto-advance after a short delay (optional)
-    setTimeout(() => {
-      if (!this.isLastExercise) {
-        this.nextExercise();
-      } else {
-        this.finishLesson();
-      }
-    }, 2000);
+    // ✅ REMOVED AUTO-ADVANCE - Let user use navigation buttons
+    // No setTimeout or automatic navigation to next exercise
   }
 
   checkAnswer(attempt: ExerciseAttempt): boolean {

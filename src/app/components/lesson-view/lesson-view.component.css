@@ -1,0 +1,370 @@
+/* lesson-view.component.css */
+
+.lesson-view-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Lesson Header */
+.lesson-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-button {
+  flex-shrink: 0;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  flex-grow: 1;
+}
+
+.lesson-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.lesson-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.lesson-type {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.jlpt-level {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.exercise-count {
+  color: #666;
+}
+
+.separator {
+  color: #ccc;
+}
+
+.teacher-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Exercises Section */
+.exercises-section {
+  margin-bottom: 2rem;
+}
+
+.exercises-section h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.exercises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Exercise Cards */
+.exercise-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.exercise-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.exercise-card mat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1rem 0.5rem 1rem;
+}
+
+.exercise-number {
+  width: 40px;
+  height: 40px;
+  background-color: #2196f3;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.exercise-card .header-content {
+  flex-grow: 1;
+}
+
+.exercise-type-badge {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.exercise-type-badge[data-type="freetext"] {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.exercise-type-badge[data-type="multi-choice"] {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.exercise-type-badge[data-type="pair-match"] {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.jlpt-level {
+  background-color: #f44336;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Exercise Content */
+.exercise-card mat-card-content {
+  padding: 1rem;
+}
+
+.question {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+/* Freetext Exercise */
+.freetext-exercise .answer-section {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  border-left: 4px solid #4caf50;
+}
+
+.freetext-exercise .answer {
+  margin: 0.5rem 0 0 0;
+  color: #333;
+  font-style: italic;
+}
+
+/* Multi-choice Exercise */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.option-item.correct-option {
+  background-color: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  font-weight: 500;
+}
+
+.option-letter {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  min-width: 25px;
+  color: #666;
+}
+
+.option-text {
+  flex-grow: 1;
+  color: #333;
+}
+
+.correct-icon {
+  color: #4caf50;
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+}
+
+/* Pair Match Exercise */
+.pairs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.pair-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.pair-item:hover {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.kanji {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  font-family: 'Noto Sans JP', sans-serif;
+  min-width: 40px;
+  text-align: center;
+}
+
+.arrow {
+  font-size: 1rem;
+  color: #666;
+}
+
+.meaning {
+  font-size: 1rem;
+  color: #555;
+  font-weight: 500;
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: #666;
+}
+
+/* No exercises message */
+.no-exercises {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.no-exercises mat-card {
+  padding: 2rem;
+}
+
+.no-exercises mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: #bbb;
+  margin-bottom: 1rem;
+}
+
+.no-exercises p {
+  color: #666;
+  margin: 0;
+}
+
+.no-pairs {
+  text-align: center;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .lesson-view-container {
+    padding: 0.5rem;
+  }
+
+  .lesson-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .lesson-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .lesson-meta {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .exercises-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exercise-card mat-card-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .pairs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pair-item {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .lesson-meta {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .separator {
+    display: none;
+  }
+}

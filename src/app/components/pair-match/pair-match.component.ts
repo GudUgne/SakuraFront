@@ -1,3 +1,5 @@
+// Updated pair-match.component.ts - Clean version with requested changes
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +19,7 @@ interface PairLibraryItem {
   kanji: string;
   answer: string;
   jlpt_level: number;
-  in_exercise?: number;
+  exercise_id: number;
   can_reuse: boolean;
 }
 
@@ -64,7 +66,7 @@ export class PairMatchComponent implements OnInit {
     this.loadPairLibrary();
   }
 
-  // Load existing exercises
+  // Load existing exercises (only those with 2+ pairs)
   loadMatchExercises(): void {
     this.loadingExercises = true;
     this.http.get<MatchExercise[]>(this.exerciseUrl).subscribe({
@@ -79,7 +81,7 @@ export class PairMatchComponent implements OnInit {
     });
   }
 
-  // Load pair library
+  // Load pair library (only single pairs available for reuse)
   loadPairLibrary(): void {
     this.loadingLibrary = true;
     let url = this.pairLibraryUrl;
@@ -101,14 +103,14 @@ export class PairMatchComponent implements OnInit {
 
   // Create individual pair for library
   createPair(): void {
-    if (!this.newKanji || !this.newMeaning) {
+    if (!this.newKanji.trim() || !this.newMeaning.trim()) {
       alert('Please enter both kanji and meaning');
       return;
     }
 
     const pairData = {
-      kanji: this.newKanji,
-      answer: this.newMeaning,
+      kanji: this.newKanji.trim(),
+      answer: this.newMeaning.trim(),
       jlpt_level: this.pairJlptLevel
     };
 
@@ -116,12 +118,13 @@ export class PairMatchComponent implements OnInit {
       next: () => {
         this.newKanji = '';
         this.newMeaning = '';
-        this.loadPairLibrary();
+        this.loadPairLibrary(); // Reload library
         alert('Pair added to library!');
       },
       error: (err) => {
         console.error('Error creating pair:', err);
-        alert('Error: ' + (err.error?.detail || 'Failed to create pair'));
+        const errorMsg = err.error?.detail || 'Failed to create pair';
+        alert('Error: ' + errorMsg);
       }
     });
   }
@@ -153,14 +156,16 @@ export class PairMatchComponent implements OnInit {
     };
 
     this.http.post<MatchExercise>(this.createFromPairsUrl, exerciseData).subscribe({
-      next: () => {
-        this.selectedPairs = [];
-        this.loadMatchExercises();
-        alert('Exercise created successfully!');
+      next: (newExercise) => {
+        this.selectedPairs = []; // Clear selection
+        this.loadMatchExercises(); // Reload exercises
+        // Note: We don't reload library because pairs should still be available for reuse
+        alert(`Exercise created successfully with ${newExercise.pair_count} pairs!`);
       },
       error: (err) => {
         console.error('Error creating exercise:', err);
-        alert('Error: ' + (err.error?.detail || 'Failed to create exercise'));
+        const errorMsg = err.error?.detail || 'Failed to create exercise';
+        alert('Error: ' + errorMsg);
       }
     });
   }
@@ -176,10 +181,30 @@ export class PairMatchComponent implements OnInit {
       this.http.delete(`${this.exerciseUrl}${id}/`).subscribe({
         next: () => {
           this.loadMatchExercises();
+          alert('Exercise deleted successfully');
         },
         error: (err) => {
           console.error('Error deleting exercise:', err);
           alert('Error deleting exercise');
+        }
+      });
+    }
+  }
+
+  // Delete individual pair from library
+  deletePairFromLibrary(pair: PairLibraryItem): void {
+    if (confirm(`Are you sure you want to delete the pair "${pair.kanji} → ${pair.answer}"?`)) {
+      // Delete the single-pair exercise that holds this library pair
+      this.http.delete(`${this.exerciseUrl}${pair.exercise_id}/`).subscribe({
+        next: () => {
+          this.loadPairLibrary();
+          // Remove from selection if it was selected
+          this.selectedPairs = this.selectedPairs.filter(p => p.id !== pair.id);
+          alert('Pair deleted from library');
+        },
+        error: (err) => {
+          console.error('Error deleting pair:', err);
+          alert('Error deleting pair');
         }
       });
     }
@@ -192,5 +217,20 @@ export class PairMatchComponent implements OnInit {
 
   get filteredPairLibrary(): PairLibraryItem[] {
     return this.pairLibrary;
+  }
+
+  // Helper method to get unique JLPT levels from selected pairs
+  getSelectedPairsJlptLevels(): number[] {
+    const levels = this.selectedPairs.map(p => p.jlpt_level);
+    return [...new Set(levels)].sort();
+  }
+
+  // Helper method to suggest exercise JLPT level based on selected pairs
+  getSuggestedExerciseJlptLevel(): number {
+    if (this.selectedPairs.length === 0) return 5;
+
+    const levels = this.getSelectedPairsJlptLevels();
+    // Return the most common level, or the median if tied
+    return levels[Math.floor(levels.length / 2)];
   }
 }

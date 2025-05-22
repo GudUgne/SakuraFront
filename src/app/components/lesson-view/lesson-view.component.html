@@ -1,0 +1,111 @@
+<!-- Fixed lesson-view.component.html - Handle null safety and pairs -->
+
+<div class="lesson-view-container" *ngIf="!loading">
+
+  <!-- Lesson Header -->
+  <div class="lesson-header" *ngIf="lesson">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <div class="header-content">
+      <h1>{{ lesson.name }}</h1>
+      <div class="lesson-meta">
+        <span class="lesson-type">{{ formatLessonType(lesson.lesson_type) }}</span>
+        <span class="separator">•</span>
+        <span class="jlpt-level">{{ formatJlptLevel(lesson.jlpt_level) }}</span>
+        <span class="separator">•</span>
+        <span class="exercise-count">{{ lesson.exercise_count }} exercises</span>
+      </div>
+      <div class="teacher-info" *ngIf="lesson.teacher">
+        Created by {{ lesson.teacher.first_name }} {{ lesson.teacher.last_name }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercises List -->
+  <div class="exercises-section" *ngIf="lesson && lesson.exercises && lesson.exercises.length > 0">
+    <h2>Lesson Exercises</h2>
+
+    <div class="exercises-grid">
+      <mat-card *ngFor="let exercise of lesson.exercises; let i = index" class="exercise-card">
+
+        <!-- Exercise Header -->
+        <mat-card-header>
+          <div class="exercise-number">{{ i + 1 }}</div>
+          <div class="header-content">
+            <mat-card-title>
+              <span class="exercise-type-badge" [attr.data-type]="exercise.type">
+                {{ exercise.type === 'multi-choice' ? 'Multiple Choice' :
+                exercise.type === 'pair-match' ? 'Pair Match' : 'Freetext' }}
+              </span>
+            </mat-card-title>
+            <mat-card-subtitle>
+              <span class="jlpt-level">N{{ exercise.jlpt_level }}</span>
+            </mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <!-- Exercise Content -->
+        <mat-card-content>
+
+          <!-- Freetext Exercise -->
+          <div *ngIf="exercise.type === 'freetext'" class="freetext-exercise">
+            <h4 class="question">{{ exercise.question }}</h4>
+            <div class="answer-section">
+              <strong>Expected Answer:</strong>
+              <p class="answer">{{ exercise.answer }}</p>
+            </div>
+          </div>
+
+          <!-- Multi-choice Exercise -->
+          <div *ngIf="exercise.type === 'multi-choice'" class="multichoice-exercise">
+            <h4 class="question">{{ exercise.question }}</h4>
+            <div class="options-list" *ngIf="exercise.options && exercise.options.length > 0">
+              <div *ngFor="let option of exercise.options; let j = index"
+                   class="option-item"
+                   [class.correct-option]="option.is_correct">
+                <span class="option-letter">{{ getOptionLetter(j) }}.</span>
+                <span class="option-text">{{ option.answer }}</span>
+                <mat-icon *ngIf="option.is_correct" class="correct-icon">check_circle</mat-icon>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pair Match Exercise -->
+          <div *ngIf="exercise.type === 'pair-match'" class="pairmatch-exercise">
+            <h4 class="question">Kanji-Meaning Matching</h4>
+            <div class="pairs-grid" *ngIf="exercise.pairs && exercise.pairs.length > 0">
+              <div *ngFor="let pair of exercise.pairs" class="pair-item">
+                <span class="kanji">{{ pair.kanji }}</span>
+                <span class="arrow">→</span>
+                <span class="meaning">{{ pair.answer }}</span>
+              </div>
+            </div>
+            <div *ngIf="!exercise.pairs || exercise.pairs.length === 0" class="no-pairs">
+              <p>No pairs available for this exercise.</p>
+            </div>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- No exercises message -->
+  <div *ngIf="lesson && (!lesson.exercises || lesson.exercises.length === 0)" class="no-exercises">
+    <mat-card>
+      <mat-card-content>
+        <mat-icon>assignment</mat-icon>
+        <p>This lesson has no exercises.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="loading">
+  <mat-spinner diameter="50"></mat-spinner>
+  <p>Loading lesson details...</p>
+</div>

@@ -86,16 +86,10 @@ export class LessonListComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Teacher actions
+  // Teacher action - view lesson details
   viewLesson(lesson: Lesson): void {
     if (lesson.id) {
-      this.router.navigate(['/app/lessons', lesson.id]);
-    }
-  }
-
-  editLesson(lesson: Lesson): void {
-    if (lesson.id) {
-      this.router.navigate(['/app/lessons/edit', lesson.id]);
+      this.router.navigate(['/app/lessons/view', lesson.id]);
     }
   }
 

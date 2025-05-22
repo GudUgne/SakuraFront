@@ -29,12 +29,26 @@ export interface Exercise {
   id?: number;
   type: string;
   jlpt_level: number;
-  question?: string;
-  answer?: string;
-  kanji?: string;
-  meaning?: string;
-  options?: any[];
+  question?: string; // For freetext and multi-choice
+  answer?: string; // For freetext
+  kanji?: string; // For single pair display (legacy)
+  meaning?: string; // For single pair display (legacy)
+  options?: MultiChoiceOption[]; // For multi-choice
+  pairs?: PairMatchPair[]; // For pair-match exercises
+  pair_count?: number; // Number of pairs in pair-match
   lesson_exercise_id?: number; // For removing from lesson
+}
+
+export interface MultiChoiceOption {
+  id?: number;
+  exercise_mc?: number;
+  answer: string;
+  is_correct: boolean;
+}
+
+export interface PairMatchPair {
+  kanji: string;
+  answer: string;
 }
 
 export interface AllExercisesResponse {
@@ -141,10 +155,15 @@ export class LessonService {
   getAllExercises(): Observable<AllExercisesResponse> {
     return this.http.get<AllExercisesResponse>(this.exercisesUrl).pipe(
       map(response => {
-        // Ensure all exercises have the correct type property
+        // Ensure all exercises have the correct type property and pairs for pair-match
         const freetext = response.freetext.map(ex => ({ ...ex, type: 'freetext' }));
         const multiChoice = response.multiChoice.map(ex => ({ ...ex, type: 'multi-choice' }));
-        const pairMatch = response.pairMatch.map(ex => ({ ...ex, type: 'pair-match' }));
+        const pairMatch = response.pairMatch.map(ex => ({
+          ...ex,
+          type: 'pair-match',
+          // Ensure pairs array exists for proper display
+          pairs: ex.pairs || []
+        }));
 
         return {
           freetext,

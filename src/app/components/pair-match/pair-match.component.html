@@ -1,3 +1,5 @@
+<!-- Updated pair-match.component.html - Clean version with requested changes -->
+
 <div class="match-exercise-container">
   <h2>Kanji-Meaning Pair Management</h2>
 
@@ -47,7 +49,7 @@
         <mat-card class="library-card">
           <mat-card-header>
             <mat-card-title>Pair Library ({{ pairLibrary.length }} pairs)</mat-card-title>
-            <mat-card-subtitle>Select pairs to create exercises</mat-card-subtitle>
+            <mat-card-subtitle>Click pairs to select them for exercises</mat-card-subtitle>
           </mat-card-header>
 
           <mat-card-content>
@@ -68,13 +70,19 @@
 
             <!-- Selected Pairs Info -->
             <div class="selection-info" *ngIf="selectedPairs.length > 0">
+              <h4>Selected Pairs ({{ selectedPairs.length }})</h4>
               <mat-chip-set>
-                <mat-chip>{{ selectedPairs.length }} pairs selected</mat-chip>
                 <mat-chip *ngFor="let pair of selectedPairs" [removable]="true" (removed)="togglePairSelection(pair)">
-                  {{ pair.kanji }} → {{ pair.answer }}
+                  {{ pair.kanji }} → {{ pair.answer }} (N{{ pair.jlpt_level }})
                   <mat-icon matChipRemove>cancel</mat-icon>
                 </mat-chip>
               </mat-chip-set>
+              <div class="selection-actions">
+                <button mat-stroked-button color="warn" (click)="clearSelection()">
+                  <mat-icon>clear_all</mat-icon>
+                  Clear All
+                </button>
+              </div>
             </div>
 
             <!-- Library Grid -->
@@ -102,7 +110,17 @@
 
                 <div class="pair-meta">
                   <span class="jlpt-badge">N{{ pair.jlpt_level }}</span>
-                  <mat-icon *ngIf="isPairSelected(pair)" class="selected-icon">check_circle</mat-icon>
+                  <div class="pair-actions">
+                    <mat-icon *ngIf="isPairSelected(pair)" class="selected-icon">check_circle</mat-icon>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="deletePairFromLibrary(pair); $event.stopPropagation()"
+                      class="delete-pair-btn"
+                      title="Delete this pair">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -127,16 +145,23 @@
             </div>
 
             <div *ngIf="selectedPairs.length > 0">
-              <mat-form-field appearance="fill">
-                <mat-label>Exercise JLPT Level</mat-label>
-                <mat-select [(ngModel)]="exerciseJlptLevel">
-                  <mat-option [value]="1">N1</mat-option>
-                  <mat-option [value]="2">N2</mat-option>
-                  <mat-option [value]="3">N3</mat-option>
-                  <mat-option [value]="4">N4</mat-option>
-                  <mat-option [value]="5">N5</mat-option>
-                </mat-select>
-              </mat-form-field>
+              <div class="exercise-config">
+                <mat-form-field appearance="fill">
+                  <mat-label>Exercise JLPT Level</mat-label>
+                  <mat-select [(ngModel)]="exerciseJlptLevel">
+                    <mat-option [value]="1">N1</mat-option>
+                    <mat-option [value]="2">N2</mat-option>
+                    <mat-option [value]="3">N3</mat-option>
+                    <mat-option [value]="4">N4</mat-option>
+                    <mat-option [value]="5">N5</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <div class="level-info" *ngIf="getSelectedPairsJlptLevels().length > 1">
+                  <mat-icon>info</mat-icon>
+                  <span>Selected pairs span levels: N{{ getSelectedPairsJlptLevels().join(', N') }}</span>
+                </div>
+              </div>
 
               <div class="selected-pairs-preview">
                 <h4>Selected Pairs ({{ selectedPairs.length }})</h4>
@@ -158,9 +183,11 @@
               color="primary"
               (click)="createExerciseFromPairs()"
               [disabled]="selectedPairs.length < 2">
+              <mat-icon>add</mat-icon>
               Create Exercise ({{ selectedPairs.length }} pairs)
             </button>
-            <button mat-button (click)="clearSelection()">
+            <button mat-button (click)="clearSelection()" [disabled]="selectedPairs.length === 0">
+              <mat-icon>clear_all</mat-icon>
               Clear Selection
             </button>
           </mat-card-actions>
@@ -178,7 +205,9 @@
         </div>
 
         <div *ngIf="!loadingExercises && matchExercises.length === 0" class="empty-state">
+          <mat-icon>assignment</mat-icon>
           <p>No matching exercises created yet.</p>
+          <p>Create exercises by selecting pairs from the library!</p>
         </div>
 
         <div *ngIf="!loadingExercises && matchExercises.length > 0" class="exercises-list">
@@ -189,7 +218,12 @@
               </mat-card-title>
               <mat-card-subtitle>{{ exercise.pair_count }} pairs</mat-card-subtitle>
 
-              <button mat-icon-button color="warn" (click)="deleteMatchExercise(exercise.id!)" class="delete-btn">
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteMatchExercise(exercise.id!)"
+                class="delete-btn"
+                title="Delete this exercise">
                 <mat-icon>delete</mat-icon>
               </button>
             </mat-card-header>
@@ -207,5 +241,6 @@
         </div>
       </div>
     </mat-tab>
+
   </mat-tab-group>
 </div>
