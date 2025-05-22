@@ -1,0 +1,181 @@
+<div class="lesson-creation-container">
+  <h2>Create a New Lesson</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-card>
+      <mat-card-content>
+        <p>{{ errorMessage }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <form [formGroup]="lessonForm" (ngSubmit)="createLesson()">
+    <mat-card class="lesson-details-card">
+      <mat-card-header>
+        <mat-card-title>Lesson Details</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Lesson Name</mat-label>
+          <input matInput formControlName="name" placeholder="Enter lesson name">
+          <mat-error *ngIf="lessonForm.get('name')?.errors?.['required']">
+            Lesson name is required
+          </mat-error>
+          <mat-error *ngIf="lessonForm.get('name')?.errors?.['minlength']">
+            Lesson name must be at least 3 characters
+          </mat-error>
+        </mat-form-field>
+
+        <div class="lesson-info">
+          <div class="info-box">
+            <span class="info-label">Lesson Type:</span>
+            <span class="info-value" [class.unavailable]="selectedExercises.length === 0">
+              {{ selectedExercises.length === 0 ? 'Not determined yet' : getLessonType() | titlecase }}
+            </span>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">JLPT Level:</span>
+            <span class="info-value" [class.unavailable]="selectedExercises.length === 0">
+              {{ selectedExercises.length === 0 ? 'Not determined yet' : 'N' + getJlptLevelRange() }}
+            </span>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Selected Exercises:</span>
+            <span class="info-value" [class.unavailable]="selectedExercises.length === 0">
+              {{ selectedExercises.length }}
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="exercise-selection-card">
+      <mat-card-header>
+        <mat-card-title>Select Exercises</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="filters">
+          <mat-form-field appearance="outline">
+            <mat-label>Search Exercises</mat-label>
+            <input matInput [(ngModel)]="searchTerm" [ngModelOptions]="{standalone: true}"
+                   (ngModelChange)="onSearchChange()" placeholder="Search in exercises...">
+            <button mat-icon-button matSuffix *ngIf="searchTerm"
+                    (click)="searchTerm=''; onSearchChange()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Exercise Type</mat-label>
+            <mat-select [(ngModel)]="typeFilter" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="onTypeFilterChange()">
+              <mat-option value="all">All Types</mat-option>
+              <mat-option value="freetext">Freetext</mat-option>
+              <mat-option value="multi-choice">Multiple Choice</mat-option>
+              <mat-option value="pair-match">Pair Match</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>JLPT Level</mat-label>
+            <mat-select [(ngModel)]="jlptFilter" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="onJlptFilterChange()">
+              <mat-option value="all">All Levels</mat-option>
+              <mat-option value="1">N1</mat-option>
+              <mat-option value="2">N2</mat-option>
+              <mat-option value="3">N3</mat-option>
+              <mat-option value="4">N4</mat-option>
+              <mat-option value="5">N5</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="loadingExercises" class="loading-exercises">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading exercises...</p>
+        </div>
+
+        <div *ngIf="!loadingExercises && filteredExercises.length === 0" class="no-exercises">
+          <p>No exercises found matching your filters.</p>
+        </div>
+
+        <div *ngIf="!loadingExercises && filteredExercises.length > 0" class="exercises-list">
+          <div class="exercises-grid">
+            <div *ngFor="let exercise of filteredExercises"
+                 class="exercise-card"
+                 [class.selected]="isExerciseSelected(exercise)"
+                 (click)="toggleExerciseSelection(exercise)">
+
+              <!-- Exercise Header -->
+              <div class="exercise-header">
+                <mat-checkbox
+                  [checked]="isExerciseSelected(exercise)"
+                  (click)="$event.stopPropagation()"
+                  (change)="toggleExerciseSelection(exercise)">
+                </mat-checkbox>
+                <span class="exercise-type-badge" [attr.data-type]="exercise.type">
+                  {{ exercise.type === 'multi-choice' ? 'Multiple Choice' :
+                  exercise.type === 'pair-match' ? 'Pair Match' : 'Freetext' }}
+                </span>
+                <span class="jlpt-level">N{{ exercise.jlpt_level }}</span>
+              </div>
+
+              <!-- Exercise Content -->
+              <div class="exercise-content">
+                <!-- Freetext exercise -->
+                <div *ngIf="exercise.type === 'freetext'">
+                  <h4 class="exercise-question">{{ exercise.question }}</h4>
+                  <p class="exercise-answer"><strong>Answer:</strong> {{ exercise.answer }}</p>
+                </div>
+
+                <!-- Multi-choice exercise -->
+                <div *ngIf="exercise.type === 'multi-choice'">
+                  <h4 class="exercise-question">{{ exercise.question }}</h4>
+                  <div class="options-container">
+                    <div *ngFor="let option of exercise.options; let i = index"
+                         class="option-item"
+                         [class.correct-option]="option.is_correct">
+                      <span class="option-letter">{{ getOptionLetter(i) }}.</span>
+                      <span class="option-text">{{ option.answer }}</span>
+                      <mat-icon *ngIf="option.is_correct" class="correct-icon">check_circle</mat-icon>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pair-match exercise -->
+                <div *ngIf="exercise.type === 'pair-match'">
+                  <div class="pair-container">
+                    <span class="kanji-part">{{ exercise.kanji }}</span>
+                    <span class="arrow">↔</span>
+                    <span class="meaning-part">{{ exercise.answer }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="lessonForm.invalid || selectedExercises.length === 0 || submitting">
+        <mat-spinner *ngIf="submitting" diameter="20" class="button-spinner"></mat-spinner>
+        <span *ngIf="!submitting">Create Lesson</span>
+      </button>
+      <button
+        mat-button
+        type="button"
+        (click)="cancelCreation()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

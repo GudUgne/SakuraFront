@@ -1,18 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { NgIf } from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import { MATERIAL_IMPORTS } from '../../material.shared';
 import { FreetextExerciseService, FreetextExercise } from '../../services/freetext-exercise.service';
 import { AuthService } from '../../services/auth.service';
-import { MatHint} from '@angular/material/form-field';
 
 @Component({
   selector: 'app-freetext-edit',
   templateUrl: './freetext-edit.component.html',
   styleUrls: ['./freetext-edit.component.css'],
   standalone: true,
-  imports: [MATERIAL_IMPORTS, ReactiveFormsModule, NgIf, RouterLink]
+  imports: [MATERIAL_IMPORTS, ReactiveFormsModule, NgIf, RouterLink, NgForOf]
 })
 export class FreetextEditComponent implements OnInit {
   exerciseForm: FormGroup;
@@ -22,7 +21,7 @@ export class FreetextEditComponent implements OnInit {
   loading = false;
   submitting = false;
   errorMessage = '';
-  jlptLevels = [1, 2, 3, 4, 5];
+  jlptLevels = [1, 2, 3, 4, 5]; // JLPT levels from N1 to N5
 
   constructor(
     private fb: FormBuilder,
@@ -44,7 +43,7 @@ export class FreetextEditComponent implements OnInit {
         this.isTeacher = user.is_teacher;
         if (!this.isTeacher) {
           // Redirect non-teachers away
-          this.router.navigate(['/app/exercise']);
+          this.router.navigate(['/app/home']);
           return;
         }
 
@@ -59,6 +58,7 @@ export class FreetextEditComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching user:', err);
+        this.router.navigate(['/app/home']);
       }
     });
   }
@@ -120,4 +120,8 @@ export class FreetextEditComponent implements OnInit {
   get questionControl() { return this.exerciseForm.get('question'); }
   get answerControl() { return this.exerciseForm.get('answer'); }
   get jlptLevelControl() { return this.exerciseForm.get('jlpt_level'); }
+
+  cancel(): void {
+    this.router.navigate(['/app/exercise']);
+  }
 }

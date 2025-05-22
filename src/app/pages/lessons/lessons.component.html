@@ -1,24 +1,22 @@
-<!--<h2>All Kanji Matches</h2>-->
+<div class="lessons-container">
+  <h1>Lessons</h1>
 
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading...</p>
+  </div>
 
-<!--<mat-table [dataSource]="matches" class="mat-elevation-z8">-->
+  <ng-container *ngIf="!loading">
+    <mat-tab-group>
+      <!-- View Lessons Tab -->
+      <mat-tab label="View Lessons">
+        <app-lesson-list [lessons]="lessons" [isTeacher]="isTeacher"></app-lesson-list>
+      </mat-tab>
 
-<!--  <ng-container matColumnDef="kanji">-->
-<!--    <mat-header-cell *matHeaderCellDef> Kanji </mat-header-cell>-->
-<!--    <mat-cell *matCellDef="let match"> {{ match.kanji }} </mat-cell>-->
-<!--  </ng-container>-->
-
-<!--  <ng-container matColumnDef="answer">-->
-<!--    <mat-header-cell *matHeaderCellDef> Meaning </mat-header-cell>-->
-<!--    <mat-cell *matCellDef="let match"> {{ match.answer }} </mat-cell>-->
-<!--  </ng-container>-->
-
-<!--  <ng-container matColumnDef="jlpt">-->
-<!--    <mat-header-cell *matHeaderCellDef> JLPT </mat-header-cell>-->
-<!--    <mat-cell *matCellDef="let match"> N{{ match.jlpt_level }} </mat-cell>-->
-<!--  </ng-container>-->
-
-<!--  <mat-header-row *matHeaderRowDef="['kanji', 'answer', 'jlpt']"></mat-header-row>-->
-<!--  <mat-row *matRowDef="let row; columns: ['kanji', 'answer', 'jlpt'];"></mat-row>-->
-<!--</mat-table>-->
-
+      <!-- Create Lesson Tab - Only for Teachers -->
+      <mat-tab label="Create Lesson" *ngIf="isTeacher">
+        <app-lesson-creation (lessonCreated)="onLessonCreated($event)"></app-lesson-creation>
+      </mat-tab>
+    </mat-tab-group>
+  </ng-container>
+</div>

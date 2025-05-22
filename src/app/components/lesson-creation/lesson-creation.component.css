@@ -1,0 +1,289 @@
+.lesson-creation-container {
+  padding: 1rem;
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.error-message {
+  margin-bottom: 1.5rem;
+}
+
+.error-message mat-card {
+  background-color: #ffebee;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.lesson-details-card,
+.exercise-selection-card {
+  margin-bottom: 1.5rem;
+}
+
+.lesson-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.info-box {
+  flex: 1;
+  min-width: 200px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #666;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.info-value.unavailable {
+  color: #999;
+  font-style: italic;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.filters mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.loading-exercises,
+.no-exercises {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  color: #666;
+}
+
+.loading-exercises mat-spinner {
+  margin-bottom: 1rem;
+}
+
+.exercises-list {
+  max-height: 600px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.exercises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1rem;
+}
+
+.exercise-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 120px;
+}
+
+.exercise-card:hover {
+  border-color: #2196f3;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.exercise-card.selected {
+  border-color: #2196f3;
+  background-color: #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.exercise-type-badge {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+.exercise-type-badge[data-type="freetext"] {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.exercise-type-badge[data-type="multi-choice"] {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.exercise-type-badge[data-type="pair-match"] {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.jlpt-level {
+  background-color: #f44336;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: center;
+}
+
+.exercise-content {
+  flex-grow: 1;
+}
+
+.exercise-question {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.exercise-answer {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.options-container {
+  margin-top: 0.5rem;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.option-letter {
+  font-weight: 500;
+  margin-right: 0.5rem;
+  min-width: 20px;
+}
+
+.option-text {
+  flex-grow: 1;
+}
+
+.correct-option {
+  color: #4caf50 !important;
+  font-weight: 500;
+}
+
+.correct-icon {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+  color: #4caf50;
+  margin-left: 0.5rem;
+}
+
+.pair-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.kanji-part {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.arrow {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.meaning-part {
+  font-size: 1.1rem;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .exercises-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .exercise-card {
+    min-width: auto;
+  }
+
+  .pair-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .lesson-info,
+  .filters,
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

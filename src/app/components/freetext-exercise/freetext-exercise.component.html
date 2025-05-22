@@ -1,7 +1,7 @@
-<div class="exercise-container">
+<div class="freetext-exercise-container">
   <h2>Freetext Exercises</h2>
 
-  <div class="exercise-actions" *ngIf="isTeacher">
+  <div class="exercise-actions">
     <button mat-raised-button color="primary" (click)="createNewExercise()">
       <mat-icon>add</mat-icon> Create New Exercise
     </button>
@@ -9,10 +9,10 @@
 
   <mat-spinner *ngIf="loading" diameter="40" class="spinner"></mat-spinner>
 
-  <div *ngIf="!loading && exercises.length === 0" class="no-exercises">
+  <div *ngIf="!loading && exercises.length === 0" class="empty-state">
     <mat-card>
       <mat-card-content>
-        <p>No exercises available.</p>
+        <p>No freetext exercises available.</p>
         <button
           mat-raised-button
           color="primary"
@@ -25,88 +25,26 @@
     </mat-card>
   </div>
 
-  <div *ngIf="!loading && currentExercise" class="current-exercise">
-    <mat-card>
+  <div *ngIf="!loading && exercises.length > 0" class="exercises-list">
+    <mat-card *ngFor="let exercise of exercises" class="exercise-card">
       <mat-card-header>
-        <mat-card-title>Exercise {{ exerciseIndex + 1 }} of {{ exercises.length }}</mat-card-title>
-        <mat-card-subtitle>JLPT N{{ currentExercise.jlpt_level }}</mat-card-subtitle>
-
-        <!-- Teacher controls -->
-        <div class="teacher-controls" *ngIf="isTeacher">
-          <button mat-icon-button color="primary" (click)="editExercise(currentExercise)" matTooltip="Edit Exercise">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteExercise(currentExercise)" matTooltip="Delete Exercise">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+        <mat-card-title>{{ exercise.question }}</mat-card-title>
+        <mat-card-subtitle>JLPT Level N{{ exercise.jlpt_level }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
-        <div class="question-container">
-          <h3>Question:</h3>
-          <p class="question-text">{{ currentExercise.question }}</p>
-        </div>
-
-        <div class="answer-section">
-          <mat-form-field appearance="outline" class="answer-field">
-            <mat-label>Your Answer</mat-label>
-            <textarea
-              matInput
-              [(ngModel)]="userAnswer"
-              placeholder="Type your answer here..."
-              [disabled]="showAnswer"
-              rows="3"
-            ></textarea>
-          </mat-form-field>
-
-          <div class="answer-actions">
-            <button
-              mat-raised-button
-              color="primary"
-              (click)="checkAnswer()"
-              [disabled]="!userAnswer.trim() || showAnswer"
-            >
-              Check Answer
-            </button>
-            <button
-              mat-button
-              (click)="resetExercise()"
-              *ngIf="showAnswer"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
-
-        <div *ngIf="showAnswer" class="feedback-container" [ngClass]="{correct: isCorrect, incorrect: !isCorrect}">
-          <mat-icon>{{ isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
-          <p>{{ feedback }}</p>
-        </div>
-
-        <div *ngIf="showAnswer" class="correct-answer">
-          <h4>Correct Answer:</h4>
-          <p>{{ currentExercise.answer }}</p>
+        <div class="answer-container">
+          <p><strong>Correct Answer:</strong> {{ exercise.answer }}</p>
         </div>
       </mat-card-content>
 
       <mat-card-actions>
-        <div class="navigation-buttons">
-          <button
-            mat-button
-            (click)="previousExercise()"
-            [disabled]="exercises.length <= 1"
-          >
-            <mat-icon>navigate_before</mat-icon> Previous
-          </button>
-          <button
-            mat-button
-            (click)="nextExercise()"
-            [disabled]="exercises.length <= 1"
-          >
-            Next <mat-icon>navigate_next</mat-icon>
-          </button>
-        </div>
+        <button mat-button color="primary" (click)="editExercise(exercise)" *ngIf="isTeacher">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteExercise(exercise)" *ngIf="isTeacher">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>

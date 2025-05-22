@@ -1,0 +1,80 @@
+<div class="lesson-list-container">
+  <!-- Filters -->
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Search Lessons</mat-label>
+      <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search by name...">
+      <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm=''; onSearchChange()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Lesson Type</mat-label>
+      <mat-select [(ngModel)]="typeFilter" (ngModelChange)="onTypeFilterChange()">
+        <mat-option value="all">All Types</mat-option>
+        <mat-option value="freetext">Freetext</mat-option>
+        <mat-option value="multi-choice">Multiple Choice</mat-option>
+        <mat-option value="pair-match">Pair Match</mat-option>
+        <mat-option value="mixed">Mixed</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>JLPT Level</mat-label>
+      <mat-select [(ngModel)]="jlptFilter" (ngModelChange)="onJlptFilterChange()">
+        <mat-option value="all">All Levels</mat-option>
+        <mat-option value="1">N1</mat-option>
+        <mat-option value="2">N2</mat-option>
+        <mat-option value="3">N3</mat-option>
+        <mat-option value="4">N4</mat-option>
+        <mat-option value="5">N5</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- No lessons message -->
+  <div *ngIf="filteredLessons.length === 0" class="no-lessons">
+    <mat-card>
+      <mat-card-content>
+        <p *ngIf="lessons.length === 0">No lessons available.</p>
+        <p *ngIf="lessons.length > 0">No lessons match your filters.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Lessons list -->
+  <div *ngIf="filteredLessons.length > 0" class="lessons-grid">
+    <mat-card *ngFor="let lesson of filteredLessons" class="lesson-card">
+      <mat-card-header>
+        <mat-card-title>{{ lesson.name }}</mat-card-title>
+        <mat-card-subtitle>
+          <span class="lesson-type">{{ lesson.lesson_type | titlecase }}</span>
+          <span class="separator">•</span>
+          <span class="jlpt-level">JLPT N{{ lesson.jlpt_level }}</span>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="exercise-count">
+          <mat-icon>assignment</mat-icon> {{ lesson.exercise_count }} exercise{{ lesson.exercise_count !== 1 ? 's' : '' }}
+        </p>
+        <p *ngIf="lesson.teacher" class="teacher-info">
+          <mat-icon>person</mat-icon> Created by {{ lesson.teacher.first_name }} {{ lesson.teacher.last_name }}
+        </p>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="viewLesson(lesson)">
+          <mat-icon>visibility</mat-icon> View
+        </button>
+        <button mat-button color="accent" (click)="editLesson(lesson)" *ngIf="isTeacher">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteLesson(lesson)" *ngIf="isTeacher">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

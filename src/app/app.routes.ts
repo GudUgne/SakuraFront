@@ -33,9 +33,28 @@ export const routes: Routes = [
       { path: 'characters', component: CharactersComponent },
       { path: 'lessons', component: LessonsComponent },
       { path: 'homework', component: HomeworkComponent },
+      // {
+      //   path: 'exercise',
+      //   component: ExerciseComponent,
+      //   canActivate: [AuthGuard],
+      //   data: { teacherOnly: true }
+      // },
+
       {
         path: 'exercise',
         component: ExerciseComponent,
+        canActivate: [AuthGuard],
+        data: { teacherOnly: true }
+      },
+      {
+        path: 'exercise/create',
+        component: FreetextEditComponent,
+        canActivate: [AuthGuard],
+        data: { teacherOnly: true }
+      },
+      {
+        path: 'exercise/edit/:id',
+        component: FreetextEditComponent,
         canActivate: [AuthGuard],
         data: { teacherOnly: true }
       },
