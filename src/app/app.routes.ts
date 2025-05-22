@@ -16,6 +16,7 @@ import {ExerciseComponent} from './pages/exercise/exercise.component';
 import {HomeworkComponent} from './pages/homework/homework.component';
 import {FreetextEditComponent} from './components/freetext-edit/freetext-edit.component';
 import {FreetextExerciseComponent} from './components/freetext-exercise/freetext-exercise.component';
+import {LessonTakingComponent} from './components/lesson-taking/lesson-taking.component';
 
 export const routes: Routes = [
   // Public routes available to any user
@@ -31,14 +32,8 @@ export const routes: Routes = [
       { path: 'home', component: HomeComponent },
       { path: 'vocabulary', component: VocabularyComponent },
       { path: 'characters', component: CharactersComponent },
-      { path: 'lessons', component: LessonsComponent },
+
       { path: 'homework', component: HomeworkComponent },
-      // {
-      //   path: 'exercise',
-      //   component: ExerciseComponent,
-      //   canActivate: [AuthGuard],
-      //   data: { teacherOnly: true }
-      // },
 
       {
         path: 'exercise',
@@ -58,6 +53,12 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         data: { teacherOnly: true }
       },
+
+      // Lessons
+      { path: 'lessons', component: LessonsComponent },
+      { path: 'lessons/:id/take', component: LessonTakingComponent },
+
+      { path: 'homework', component: HomeworkComponent },
 
       { path: 'messages', component: MessagesComponent },
       { path: 'studygroups', component: StudyGroupsComponent },

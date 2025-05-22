@@ -29,11 +29,10 @@ export class KanjiHomeWidgetComponent implements OnInit {
     const savedKanji = localStorage.getItem('kanjiOfTheDayData');
 
     if (savedDate === today && savedKanji) {
-      // ✅ Already have today's kanji cached
       const data = JSON.parse(savedKanji);
       this.applyKanjiData(data);
     } else {
-      // ❌ Need to fetch a new kanji
+
       this.kanjiService.getRandomKanji().subscribe(data => {
         this.applyKanjiData(data);
         localStorage.setItem('kanjiOfTheDayDate', today);

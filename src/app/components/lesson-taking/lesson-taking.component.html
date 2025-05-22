@@ -1,0 +1,234 @@
+<div class="lesson-taking-container" *ngIf="!loading">
+
+  <!-- Lesson Header -->
+  <div class="lesson-header" *ngIf="lesson">
+    <h1>{{ lesson.name }}</h1>
+    <div class="lesson-info">
+      <span class="lesson-type">{{ lesson.lesson_type | titlecase }}</span>
+      <span class="separator">•</span>
+      <span class="jlpt-level">JLPT {{ lesson.jlpt_level }}</span>
+      <span class="separator">•</span>
+      <span class="exercise-count">{{ lesson.exercise_count }} exercises</span>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container" *ngIf="!showResults">
+    <mat-progress-bar
+      [value]="((currentExerciseIndex + 1) / exercises.length) * 100"
+      mode="determinate">
+    </mat-progress-bar>
+    <div class="progress-text">
+      Exercise {{ currentExerciseIndex + 1 }} of {{ exercises.length }}
+    </div>
+  </div>
+
+  <!-- Exercise Navigation -->
+  <div class="exercise-nav" *ngIf="!showResults">
+    <div class="nav-pills">
+      <button
+        *ngFor="let exercise of exercises; let i = index"
+        mat-mini-fab
+        [color]="i === currentExerciseIndex ? 'primary' : (exercise.isCorrect === true ? 'accent' : (exercise.isCorrect === false ? 'warn' : ''))"
+        (click)="goToExercise(i)"
+        [class.current]="i === currentExerciseIndex">
+        {{ i + 1 }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Current Exercise -->
+  <div class="exercise-container" *ngIf="currentExercise && !showResults">
+    <mat-card class="exercise-card">
+
+      <!-- Freetext Exercise -->
+      <div *ngIf="currentExercise.exercise.type === 'freetext'">
+        <mat-card-header>
+          <mat-card-title>{{ currentExercise.exercise.question }}</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Your Answer</mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="currentExercise.studentAnswer"
+              [disabled]="isCurrentExerciseAnswered"
+              placeholder="Type your answer here..."
+              rows="3">
+            </textarea>
+          </mat-form-field>
+
+          <!-- Show result after submission -->
+          <div *ngIf="isCurrentExerciseAnswered" class="answer-feedback">
+            <div class="result-badge" [class.correct]="currentExercise.isCorrect" [class.incorrect]="!currentExercise.isCorrect">
+              <mat-icon>{{ currentExercise.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ currentExercise.isCorrect ? 'Correct!' : 'Not quite right' }}
+            </div>
+            <div class="correct-answer">
+              <strong>Correct answer:</strong> {{ currentExercise.exercise.answer }}
+            </div>
+          </div>
+        </mat-card-content>
+      </div>
+
+      <!-- Multiple Choice Exercise -->
+      <div *ngIf="currentExercise.exercise.type === 'multi-choice'">
+        <mat-card-header>
+          <mat-card-title>{{ currentExercise.exercise.question }}</mat-card-title>
+          <mat-card-subtitle>Select all correct answers</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="options-list">
+            <div *ngFor="let option of currentExercise.exercise.options; let i = index"
+                 class="option-item"
+                 [class.selected]="isOptionSelected(option.id)"
+                 [class.correct]="isCurrentExerciseAnswered && option.is_correct"
+                 [class.incorrect]="isCurrentExerciseAnswered && !option.is_correct && isOptionSelected(option.id)">
+
+              <mat-checkbox
+                [checked]="isOptionSelected(option.id)"
+                [disabled]="isCurrentExerciseAnswered"
+                (change)="toggleOption(option.id)">
+                <span class="option-letter">{{ getOptionLetter(i) }}.</span>
+                <span class="option-text">{{ option.answer }}</span>
+                <mat-icon *ngIf="isCurrentExerciseAnswered && option.is_correct" class="correct-icon">check</mat-icon>
+              </mat-checkbox>
+            </div>
+          </div>
+
+          <!-- Show result after submission -->
+          <div *ngIf="isCurrentExerciseAnswered" class="answer-feedback">
+            <div class="result-badge" [class.correct]="currentExercise.isCorrect" [class.incorrect]="!currentExercise.isCorrect">
+              <mat-icon>{{ currentExercise.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ currentExercise.isCorrect ? 'Correct!' : 'Not quite right' }}
+            </div>
+          </div>
+        </mat-card-content>
+      </div>
+
+      <!-- Pair Match Exercise -->
+      <div *ngIf="currentExercise.exercise.type === 'pair-match'">
+        <mat-card-header>
+          <mat-card-title>Match the Kanji with its meaning</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="pair-match-container">
+            <div class="kanji-display">{{ currentExercise.exercise.kanji }}</div>
+            <div class="arrow">↓</div>
+            <mat-form-field appearance="outline" class="meaning-input">
+              <mat-label>Meaning</mat-label>
+              <input
+                matInput
+                [ngModel]="getPairMatchAnswer(currentExercise.exercise.kanji)"
+                (ngModelChange)="setPairMatchAnswer(currentExercise.exercise.kanji, $event)"
+                [disabled]="isCurrentExerciseAnswered"
+                placeholder="Enter the meaning">
+            </mat-form-field>
+          </div>
+
+          <!-- Show result after submission -->
+          <div *ngIf="isCurrentExerciseAnswered" class="answer-feedback">
+            <div class="result-badge" [class.correct]="currentExercise.isCorrect" [class.incorrect]="!currentExercise.isCorrect">
+              <mat-icon>{{ currentExercise.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ currentExercise.isCorrect ? 'Correct!' : 'Not quite right' }}
+            </div>
+            <div class="correct-answer">
+              <strong>Correct answer:</strong> {{ currentExercise.exercise.answer }}
+            </div>
+          </div>
+        </mat-card-content>
+      </div>
+
+      <!-- Exercise Actions -->
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="submitAnswer()"
+          [disabled]="isCurrentExerciseAnswered">
+          Submit Answer
+        </button>
+
+        <button
+          mat-button
+          (click)="previousExercise()"
+          [disabled]="isFirstExercise">
+          Previous
+        </button>
+
+        <button
+          mat-button
+          (click)="nextExercise()"
+          [disabled]="isLastExercise"
+          *ngIf="isCurrentExerciseAnswered">
+          Next
+        </button>
+
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="finishLesson()"
+          *ngIf="isLastExercise && isCurrentExerciseAnswered">
+          Finish Lesson
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Results Screen -->
+  <div class="results-container" *ngIf="showResults">
+    <mat-card class="results-card">
+      <mat-card-header>
+        <mat-card-title>Lesson Completed!</mat-card-title>
+        <mat-card-subtitle>{{ lesson?.name }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="score-display">
+          <div class="score-circle" [class.excellent]="score >= 90" [class.good]="score >= 70 && score < 90" [class.needs-work]="score < 70">
+            <span class="score-number">{{ score }}%</span>
+          </div>
+          <div class="score-text">
+            <span *ngIf="score >= 90">Excellent work!</span>
+            <span *ngIf="score >= 70 && score < 90">Good job!</span>
+            <span *ngIf="score < 70">Keep practicing!</span>
+          </div>
+        </div>
+
+        <div class="results-breakdown">
+          <div class="stat-item">
+            <span class="stat-label">Correct Answers:</span>
+            <span class="stat-value">{{ correctAnswersCount }} / {{ totalExercisesCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Lesson Type:</span>
+            <span class="stat-value">{{ lesson?.lesson_type | titlecase }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">JLPT Level:</span>
+            <span class="stat-value">N{{ lesson?.jlpt_level }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="restartLesson()">
+          <mat-icon>refresh</mat-icon> Try Again
+        </button>
+        <button mat-button (click)="goBackToLessons()">
+          <mat-icon>arrow_back</mat-icon> Back to Lessons
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="loading">
+  <mat-spinner diameter="50"></mat-spinner>
+  <p>Loading lesson...</p>
+</div>

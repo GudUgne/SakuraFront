@@ -1,71 +1,211 @@
 <div class="match-exercise-container">
-  <h2>Create Kanji-Meaning Matching Pairs</h2>
+  <h2>Kanji-Meaning Pair Management</h2>
 
-  <!-- Simple entry form for kanji-meaning pairs -->
-  <div class="match-form">
-    <mat-form-field appearance="fill">
-      <mat-label>Kanji</mat-label>
-      <input matInput [(ngModel)]="newKanji" placeholder="Enter kanji">
-    </mat-form-field>
+  <mat-tab-group>
+    <!-- Tab 1: Pair Library -->
+    <mat-tab label="Pair Library">
+      <div class="tab-content">
 
-    <mat-form-field appearance="fill">
-      <mat-label>Meaning</mat-label>
-      <input matInput [(ngModel)]="newMeaning" placeholder="Enter meaning">
-    </mat-form-field>
+        <!-- Create New Pair -->
+        <mat-card class="create-pair-card">
+          <mat-card-header>
+            <mat-card-title>Add New Pair to Library</mat-card-title>
+            <mat-card-subtitle>Create individual pairs that can be reused in multiple exercises</mat-card-subtitle>
+          </mat-card-header>
 
-    <mat-form-field appearance="fill">
-      <mat-label>JLPT Level</mat-label>
-      <mat-select [(ngModel)]="jlptLevel">
-        <mat-option [value]="1">N1</mat-option>
-        <mat-option [value]="2">N2</mat-option>
-        <mat-option [value]="3">N3</mat-option>
-        <mat-option [value]="4">N4</mat-option>
-        <mat-option [value]="5">N5</mat-option>
-      </mat-select>
-    </mat-form-field>
+          <mat-card-content>
+            <div class="add-pair-form">
+              <mat-form-field appearance="fill">
+                <mat-label>Kanji</mat-label>
+                <input matInput [(ngModel)]="newKanji" placeholder="Enter kanji">
+              </mat-form-field>
 
-    <button mat-raised-button color="primary" (click)="saveMatchToDb()">
-      Save Match
-    </button>
-  </div>
+              <mat-form-field appearance="fill">
+                <mat-label>Meaning</mat-label>
+                <input matInput [(ngModel)]="newMeaning" placeholder="Enter meaning">
+              </mat-form-field>
 
-  <h2>Current Matching Exercises</h2>
+              <mat-form-field appearance="fill">
+                <mat-label>JLPT Level</mat-label>
+                <mat-select [(ngModel)]="pairJlptLevel">
+                  <mat-option [value]="1">N1</mat-option>
+                  <mat-option [value]="2">N2</mat-option>
+                  <mat-option [value]="3">N3</mat-option>
+                  <mat-option [value]="4">N4</mat-option>
+                  <mat-option [value]="5">N5</mat-option>
+                </mat-select>
+              </mat-form-field>
 
-  <div *ngIf="loadingMatches" class="loading-container">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>Loading exercises...</p>
-  </div>
+              <button mat-raised-button color="primary" (click)="createPair()">
+                Add to Library
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-  <div *ngIf="!loadingMatches && matchingExercises.length === 0" class="empty-state">
-    <p>No matching exercises available.</p>
-  </div>
+        <!-- Browse Library -->
+        <mat-card class="library-card">
+          <mat-card-header>
+            <mat-card-title>Pair Library ({{ pairLibrary.length }} pairs)</mat-card-title>
+            <mat-card-subtitle>Select pairs to create exercises</mat-card-subtitle>
+          </mat-card-header>
 
-  <mat-table *ngIf="!loadingMatches && matchingExercises.length > 0" [dataSource]="matchingExercises" class="mat-elevation-z8">
-    <ng-container matColumnDef="kanji">
-      <mat-header-cell *matHeaderCellDef>Kanji</mat-header-cell>
-      <mat-cell *matCellDef="let match">{{ match.kanji }}</mat-cell>
-    </ng-container>
+          <mat-card-content>
+            <!-- Filter -->
+            <div class="library-filters">
+              <mat-form-field appearance="fill">
+                <mat-label>Filter by JLPT Level</mat-label>
+                <mat-select [(ngModel)]="libraryJlptFilter" (selectionChange)="onLibraryFilterChange()">
+                  <mat-option value="all">All Levels</mat-option>
+                  <mat-option value="1">N1</mat-option>
+                  <mat-option value="2">N2</mat-option>
+                  <mat-option value="3">N3</mat-option>
+                  <mat-option value="4">N4</mat-option>
+                  <mat-option value="5">N5</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
 
-    <ng-container matColumnDef="meaning">
-      <mat-header-cell *matHeaderCellDef>Meaning</mat-header-cell>
-      <mat-cell *matCellDef="let match">{{ match.answer }}</mat-cell>
-    </ng-container>
+            <!-- Selected Pairs Info -->
+            <div class="selection-info" *ngIf="selectedPairs.length > 0">
+              <mat-chip-set>
+                <mat-chip>{{ selectedPairs.length }} pairs selected</mat-chip>
+                <mat-chip *ngFor="let pair of selectedPairs" [removable]="true" (removed)="togglePairSelection(pair)">
+                  {{ pair.kanji }} → {{ pair.answer }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-set>
+            </div>
 
-    <ng-container matColumnDef="jlpt">
-      <mat-header-cell *matHeaderCellDef>JLPT Level</mat-header-cell>
-      <mat-cell *matCellDef="let match">N{{ match.jlpt_level }}</mat-cell>
-    </ng-container>
+            <!-- Library Grid -->
+            <div *ngIf="loadingLibrary" class="loading-container">
+              <mat-spinner diameter="30"></mat-spinner>
+              <p>Loading library...</p>
+            </div>
 
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-      <mat-cell *matCellDef="let match">
-        <button mat-icon-button color="warn" (click)="deleteMatchingExercise(match.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-cell>
-    </ng-container>
+            <div *ngIf="!loadingLibrary && pairLibrary.length === 0" class="empty-library">
+              <p>No pairs in library. Create some pairs above!</p>
+            </div>
 
-    <mat-header-row *matHeaderRowDef="['kanji', 'meaning', 'jlpt', 'actions']"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: ['kanji', 'meaning', 'jlpt', 'actions'];"></mat-row>
-  </mat-table>
+            <div *ngIf="!loadingLibrary && pairLibrary.length > 0" class="library-grid">
+              <div
+                *ngFor="let pair of filteredPairLibrary"
+                class="library-item"
+                [class.selected]="isPairSelected(pair)"
+                (click)="togglePairSelection(pair)">
+
+                <div class="pair-content">
+                  <span class="kanji">{{ pair.kanji }}</span>
+                  <span class="arrow">→</span>
+                  <span class="meaning">{{ pair.answer }}</span>
+                </div>
+
+                <div class="pair-meta">
+                  <span class="jlpt-badge">N{{ pair.jlpt_level }}</span>
+                  <mat-icon *ngIf="isPairSelected(pair)" class="selected-icon">check_circle</mat-icon>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab 2: Create Exercise -->
+    <mat-tab label="Create Exercise">
+      <div class="tab-content">
+
+        <mat-card class="create-exercise-card">
+          <mat-card-header>
+            <mat-card-title>Create Exercise from Selected Pairs</mat-card-title>
+            <mat-card-subtitle>Group pairs into one matching exercise</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div *ngIf="selectedPairs.length === 0" class="no-selection">
+              <p>No pairs selected. Go to the Pair Library tab to select pairs.</p>
+            </div>
+
+            <div *ngIf="selectedPairs.length > 0">
+              <mat-form-field appearance="fill">
+                <mat-label>Exercise JLPT Level</mat-label>
+                <mat-select [(ngModel)]="exerciseJlptLevel">
+                  <mat-option [value]="1">N1</mat-option>
+                  <mat-option [value]="2">N2</mat-option>
+                  <mat-option [value]="3">N3</mat-option>
+                  <mat-option [value]="4">N4</mat-option>
+                  <mat-option [value]="5">N5</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="selected-pairs-preview">
+                <h4>Selected Pairs ({{ selectedPairs.length }})</h4>
+                <div class="pairs-preview-grid">
+                  <div *ngFor="let pair of selectedPairs" class="pair-preview">
+                    <span class="kanji">{{ pair.kanji }}</span>
+                    <span class="arrow">→</span>
+                    <span class="meaning">{{ pair.answer }}</span>
+                    <span class="level">N{{ pair.jlpt_level }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="createExerciseFromPairs()"
+              [disabled]="selectedPairs.length < 2">
+              Create Exercise ({{ selectedPairs.length }} pairs)
+            </button>
+            <button mat-button (click)="clearSelection()">
+              Clear Selection
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab 3: Existing Exercises -->
+    <mat-tab label="Existing Exercises">
+      <div class="tab-content">
+
+        <div *ngIf="loadingExercises" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading exercises...</p>
+        </div>
+
+        <div *ngIf="!loadingExercises && matchExercises.length === 0" class="empty-state">
+          <p>No matching exercises created yet.</p>
+        </div>
+
+        <div *ngIf="!loadingExercises && matchExercises.length > 0" class="exercises-list">
+          <mat-card *ngFor="let exercise of matchExercises" class="exercise-card">
+            <mat-card-header>
+              <mat-card-title>
+                Matching Exercise - JLPT N{{ exercise.jlpt_level }}
+              </mat-card-title>
+              <mat-card-subtitle>{{ exercise.pair_count }} pairs</mat-card-subtitle>
+
+              <button mat-icon-button color="warn" (click)="deleteMatchExercise(exercise.id!)" class="delete-btn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="pairs-preview">
+                <div *ngFor="let pair of exercise.pairs" class="pair-item">
+                  <span class="kanji">{{ pair.kanji }}</span>
+                  <span class="arrow">→</span>
+                  <span class="meaning">{{ pair.answer }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

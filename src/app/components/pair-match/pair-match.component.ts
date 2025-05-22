@@ -2,7 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../material.shared';
-import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../services/exercise-match.service';
+import { HttpClient } from '@angular/common/http';
+import {MatChip, MatChipSet} from '@angular/material/chips';
+
+interface MatchExercise {
+  id?: number;
+  jlpt_level: number;
+  pairs: { kanji: string; answer: string }[];
+  pair_count?: number;
+}
+
+interface PairLibraryItem {
+  id: number;
+  kanji: string;
+  answer: string;
+  jlpt_level: number;
+  in_exercise?: number;
+  can_reuse: boolean;
+}
 
 @Component({
   selector: 'app-pair-match',
@@ -10,135 +27,170 @@ import { ExerciseMatchService, ExerciseMatch, ExerciseMatchOption } from '../../
   imports: [
     CommonModule,
     FormsModule,
-    MATERIAL_IMPORTS
+    MATERIAL_IMPORTS,
+    MatChipSet,
+    MatChip
   ],
   templateUrl: './pair-match.component.html',
   styleUrls: ['./pair-match.component.css']
 })
 export class PairMatchComponent implements OnInit {
-  matchingExercises: ExerciseMatch[] = [];
-  loadingMatches = false;
+  matchExercises: MatchExercise[] = [];
+  pairLibrary: PairLibraryItem[] = [];
+  selectedPairs: PairLibraryItem[] = [];
 
-  // For matching input fields
+  loadingExercises = false;
+  loadingLibrary = false;
+
+  // For creating individual pairs
   newKanji = '';
   newMeaning = '';
-  jlptLevel = 5;
+  pairJlptLevel = 5;
 
-  // To track existing pairs for duplicate prevention
-  existingPairs: Set<string> = new Set();
+  // For creating exercises
+  exerciseJlptLevel = 5;
 
-  constructor(private matchService: ExerciseMatchService) {}
+  // Filters
+  libraryJlptFilter = 'all';
+
+  private exerciseUrl = 'http://127.0.0.1:8000/api/exercise-match/';
+  private pairLibraryUrl = 'http://127.0.0.1:8000/api/pair-library/';
+  private createFromPairsUrl = 'http://127.0.0.1:8000/api/create-exercise-from-pairs/';
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.loadMatchingExercises();
-    this.loadMatchOptions();
+    this.loadMatchExercises();
+    this.loadPairLibrary();
   }
 
-  loadMatchingExercises(): void {
-    this.loadingMatches = true;
-    this.matchService.getMatches().subscribe({
-      next: (matches) => {
-        this.matchingExercises = matches;
-        this.loadingMatches = false;
+  // Load existing exercises
+  loadMatchExercises(): void {
+    this.loadingExercises = true;
+    this.http.get<MatchExercise[]>(this.exerciseUrl).subscribe({
+      next: (exercises) => {
+        this.matchExercises = exercises;
+        this.loadingExercises = false;
       },
       error: (err) => {
-        console.error('Error loading matching exercises:', err);
-        this.loadingMatches = false;
+        console.error('Error loading exercises:', err);
+        this.loadingExercises = false;
       }
     });
   }
 
-  loadMatchOptions(): void {
-    this.matchService.getAllMatchOptions().subscribe({
-      next: (options) => {
-        // Store both directions of each pair to prevent duplicates
-        options.forEach(option => {
-          const normalizedAnswer = option.answer.toLowerCase();
-          const normalizedKanji = option.kanji.toLowerCase();
-          this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
-          this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
-        });
+  // Load pair library
+  loadPairLibrary(): void {
+    this.loadingLibrary = true;
+    let url = this.pairLibraryUrl;
+    if (this.libraryJlptFilter !== 'all') {
+      url += `?jlpt_level=${this.libraryJlptFilter}`;
+    }
+
+    this.http.get<PairLibraryItem[]>(url).subscribe({
+      next: (pairs) => {
+        this.pairLibrary = pairs;
+        this.loadingLibrary = false;
       },
       error: (err) => {
-        console.error('Error loading match options:', err);
+        console.error('Error loading pair library:', err);
+        this.loadingLibrary = false;
       }
     });
   }
 
-  // Check if a potential match would be a duplicate
-  isDuplicate(kanji: string, answer: string): boolean {
-    const normalizedAnswer = answer.toLowerCase();
-    const normalizedKanji = kanji.toLowerCase();
-    return this.existingPairs.has(`${normalizedKanji}|${normalizedAnswer}`) ||
-      this.existingPairs.has(`${normalizedAnswer}|${normalizedKanji}`);
-  }
-
-  saveMatchToDb(): void {
+  // Create individual pair for library
+  createPair(): void {
     if (!this.newKanji || !this.newMeaning) {
       alert('Please enter both kanji and meaning');
       return;
     }
 
-    // Check if this pair or its reverse already exists
-    if (this.isDuplicate(this.newKanji, this.newMeaning)) {
-      alert(`A matching pair with kanji "${this.newKanji}" and meaning "${this.newMeaning}" already exists`);
-      return;
-    }
-
-    // Create the parent match
-    const newMatch: ExerciseMatch = {
-      jlpt_level: this.jlptLevel
+    const pairData = {
+      kanji: this.newKanji,
+      answer: this.newMeaning,
+      jlpt_level: this.pairJlptLevel
     };
 
-    this.matchService.addMatch(newMatch).subscribe({
-      next: (createdMatch) => {
-        // Now create the option
-        const newOption: ExerciseMatchOption = {
-          exercise_match: createdMatch.id!,
-          kanji: this.newKanji,
-          answer: this.newMeaning
-        };
-
-        this.matchService.addMatchOption(newOption).subscribe({
-          next: () => {
-            // Add both directions to prevent future duplicates
-            const normalizedAnswer = this.newMeaning.toLowerCase();
-            const normalizedKanji = this.newKanji.toLowerCase();
-            this.existingPairs.add(`${normalizedKanji}|${normalizedAnswer}`);
-            this.existingPairs.add(`${normalizedAnswer}|${normalizedKanji}`);
-
-            // Reset form
-            this.newKanji = '';
-            this.newMeaning = '';
-
-            // Refresh list
-            this.loadMatchingExercises();
-
-            alert('Match saved successfully');
-          },
-          error: (err) => {
-            console.error('Error saving match option:', err);
-            alert('Error saving match option');
-          }
-        });
+    this.http.post<PairLibraryItem>(this.pairLibraryUrl, pairData).subscribe({
+      next: () => {
+        this.newKanji = '';
+        this.newMeaning = '';
+        this.loadPairLibrary();
+        alert('Pair added to library!');
       },
       error: (err) => {
-        console.error('Error saving match:', err);
-        alert('Error saving match');
+        console.error('Error creating pair:', err);
+        alert('Error: ' + (err.error?.detail || 'Failed to create pair'));
       }
     });
   }
 
-  deleteMatchingExercise(id: number): void {
-    if (confirm('Are you sure you want to delete this matching exercise?')) {
-      this.matchService.deleteMatch(id).subscribe({
+  // Toggle pair selection
+  togglePairSelection(pair: PairLibraryItem): void {
+    const index = this.selectedPairs.findIndex(p => p.id === pair.id);
+    if (index > -1) {
+      this.selectedPairs.splice(index, 1);
+    } else {
+      this.selectedPairs.push(pair);
+    }
+  }
+
+  isPairSelected(pair: PairLibraryItem): boolean {
+    return this.selectedPairs.some(p => p.id === pair.id);
+  }
+
+  // Create exercise from selected pairs
+  createExerciseFromPairs(): void {
+    if (this.selectedPairs.length < 2) {
+      alert('Please select at least 2 pairs');
+      return;
+    }
+
+    const exerciseData = {
+      pair_ids: this.selectedPairs.map(p => p.id),
+      jlpt_level: this.exerciseJlptLevel
+    };
+
+    this.http.post<MatchExercise>(this.createFromPairsUrl, exerciseData).subscribe({
+      next: () => {
+        this.selectedPairs = [];
+        this.loadMatchExercises();
+        alert('Exercise created successfully!');
+      },
+      error: (err) => {
+        console.error('Error creating exercise:', err);
+        alert('Error: ' + (err.error?.detail || 'Failed to create exercise'));
+      }
+    });
+  }
+
+  // Clear selections
+  clearSelection(): void {
+    this.selectedPairs = [];
+  }
+
+  // Delete exercise
+  deleteMatchExercise(id: number): void {
+    if (confirm('Are you sure you want to delete this exercise?')) {
+      this.http.delete(`${this.exerciseUrl}${id}/`).subscribe({
         next: () => {
-          this.loadMatchingExercises();
+          this.loadMatchExercises();
         },
         error: (err) => {
-          console.error('Error deleting matching exercise:', err);
+          console.error('Error deleting exercise:', err);
+          alert('Error deleting exercise');
         }
       });
     }
+  }
+
+  // Filter library
+  onLibraryFilterChange(): void {
+    this.loadPairLibrary();
+  }
+
+  get filteredPairLibrary(): PairLibraryItem[] {
+    return this.pairLibrary;
   }
 }

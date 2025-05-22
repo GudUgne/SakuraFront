@@ -1,0 +1,306 @@
+.lesson-taking-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Lesson Header */
+.lesson-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.lesson-header h1 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.lesson-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.lesson-type {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.jlpt-level {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.separator {
+  color: #ccc;
+}
+
+/* Progress */
+.progress-container {
+  margin-bottom: 2rem;
+}
+
+.progress-text {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Exercise Navigation */
+.exercise-nav {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nav-pills button {
+  width: 40px;
+  height: 40px;
+  font-weight: 500;
+}
+
+.nav-pills button.current {
+  transform: scale(1.1);
+}
+
+/* Exercise Container */
+.exercise-container {
+  margin-bottom: 2rem;
+}
+
+.exercise-card {
+  padding: 1.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Answer Feedback */
+.answer-feedback {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.result-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.result-badge.correct {
+  color: #4caf50;
+}
+
+.result-badge.incorrect {
+  color: #f44336;
+}
+
+.correct-answer {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Multiple Choice Options */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.option-item {
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.option-item.selected {
+  border-color: #2196f3;
+  background-color: #e3f2fd;
+}
+
+.option-item.correct {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+}
+
+.option-item.incorrect {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.option-letter {
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.option-text {
+  flex-grow: 1;
+}
+
+.correct-icon {
+  color: #4caf50;
+  margin-left: auto;
+}
+
+/* Pair Match */
+.pair-match-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.kanji-display {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #333;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.arrow {
+  font-size: 2rem;
+  color: #666;
+}
+
+.meaning-input {
+  width: 300px;
+}
+
+/* Results */
+.results-container {
+  display: flex;
+  justify-content: center;
+}
+
+.results-card {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  padding: 2rem;
+}
+
+.score-display {
+  margin: 2rem 0;
+}
+
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  border: 4px solid;
+}
+
+.score-circle.excellent {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.score-circle.good {
+  border-color: #ff9800;
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.score-circle.needs-work {
+  border-color: #f44336;
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.score-number {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.score-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.results-breakdown {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.stat-label {
+  color: #666;
+}
+
+.stat-value {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .lesson-taking-container {
+    padding: 0.5rem;
+  }
+
+  .lesson-info {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .nav-pills {
+    justify-content: center;
+  }
+
+  .kanji-display {
+    font-size: 3rem;
+  }
+
+  .meaning-input {
+    width: 250px;
+  }
+}

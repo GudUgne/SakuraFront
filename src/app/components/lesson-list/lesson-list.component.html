@@ -49,31 +49,46 @@
       <mat-card-header>
         <mat-card-title>{{ lesson.name }}</mat-card-title>
         <mat-card-subtitle>
-          <span class="lesson-type">{{ lesson.lesson_type | titlecase }}</span>
+          <span class="lesson-type">{{ formatLessonType(lesson.lesson_type) }}</span>
           <span class="separator">•</span>
-          <span class="jlpt-level">JLPT N{{ lesson.jlpt_level }}</span>
+          <span class="jlpt-level">{{ formatJlptLevel(lesson.jlpt_level) }}</span>
         </mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
         <p class="exercise-count">
-          <mat-icon>assignment</mat-icon> {{ lesson.exercise_count }} exercise{{ lesson.exercise_count !== 1 ? 's' : '' }}
+          <mat-icon>assignment</mat-icon>
+          {{ lesson.exercise_count }} exercise{{ lesson.exercise_count !== 1 ? 's' : '' }}
         </p>
         <p *ngIf="lesson.teacher" class="teacher-info">
-          <mat-icon>person</mat-icon> Created by {{ lesson.teacher.first_name }} {{ lesson.teacher.last_name }}
+          <mat-icon>person</mat-icon>
+          Created by {{ lesson.teacher.first_name }} {{ lesson.teacher.last_name }}
         </p>
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-button color="primary" (click)="viewLesson(lesson)">
-          <mat-icon>visibility</mat-icon> View
-        </button>
-        <button mat-button color="accent" (click)="editLesson(lesson)" *ngIf="isTeacher">
-          <mat-icon>edit</mat-icon> Edit
-        </button>
-        <button mat-button color="warn" (click)="deleteLesson(lesson)" *ngIf="isTeacher">
-          <mat-icon>delete</mat-icon> Delete
-        </button>
+        <!-- Student Actions -->
+        <ng-container *ngIf="!isTeacher">
+          <button mat-raised-button color="primary" (click)="takeLesson(lesson)">
+            <mat-icon>play_arrow</mat-icon> Take Lesson
+          </button>
+          <button mat-button (click)="viewLesson(lesson)">
+            <mat-icon>visibility</mat-icon> Preview
+          </button>
+        </ng-container>
+
+        <!-- Teacher Actions -->
+        <ng-container *ngIf="isTeacher">
+          <button mat-button color="primary" (click)="viewLesson(lesson)">
+            <mat-icon>visibility</mat-icon> View
+          </button>
+          <button mat-button color="accent" (click)="editLesson(lesson)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-button color="warn" (click)="deleteLesson(lesson)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </ng-container>
       </mat-card-actions>
     </mat-card>
   </div>

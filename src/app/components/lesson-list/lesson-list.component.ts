@@ -86,6 +86,7 @@ export class LessonListComponent implements OnInit {
     this.applyFilters();
   }
 
+  // Teacher actions
   viewLesson(lesson: Lesson): void {
     if (lesson.id) {
       this.router.navigate(['/app/lessons', lesson.id]);
@@ -102,14 +103,57 @@ export class LessonListComponent implements OnInit {
     if (!lesson.id) return;
 
     if (confirm(`Are you sure you want to delete the lesson "${lesson.name}"?`)) {
-      // Implement the delete functionality
-      // This would typically call a service method
-      console.log('Deleting lesson', lesson.id);
-
-      // After deleting, refresh the list
-      // For now, we'll just remove it from the local array
-      this.lessons = this.lessons.filter(l => l.id !== lesson.id);
-      this.applyFilters();
+      this.lessonService.deleteLesson(lesson.id).subscribe({
+        next: () => {
+          // Remove from local array
+          this.lessons = this.lessons.filter(l => l.id !== lesson.id);
+          this.applyFilters();
+        },
+        error: (err) => {
+          console.error('Error deleting lesson:', err);
+          alert('Failed to delete lesson. Please try again.');
+        }
+      });
     }
+  }
+
+  // Student action
+  takeLesson(lesson: Lesson): void {
+    if (lesson.id) {
+      this.router.navigate(['/app/lessons', lesson.id, 'take']);
+    }
+  }
+
+  // Helper method to format lesson type for display
+  formatLessonType(lessonType: string): string {
+    switch (lessonType) {
+      case 'freetext':
+        return 'Freetext';
+      case 'multi-choice':
+        return 'Multiple Choice';
+      case 'pair-match':
+        return 'Pair Match';
+      case 'mixed':
+        return 'Mixed';
+      default:
+        return lessonType;
+    }
+  }
+
+  // Helper method to format JLPT level
+  formatJlptLevel(jlptLevel: string | number): string {
+    if (typeof jlptLevel === 'number') {
+      return `N${jlptLevel}`;
+    }
+
+    if (typeof jlptLevel === 'string') {
+      if (jlptLevel.includes('-')) {
+        const [min, max] = jlptLevel.split('-');
+        return `N${min}-N${max}`;
+      }
+      return `N${jlptLevel}`;
+    }
+
+    return 'Unknown';
   }
 }

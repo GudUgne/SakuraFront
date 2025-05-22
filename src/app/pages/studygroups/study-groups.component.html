@@ -6,7 +6,7 @@
       <mat-card-title>Your Groups</mat-card-title>
       <mat-list>
         <mat-list-item *ngFor="let group of groups">
-          <!-- CHANGE: make group name clickable to navigate to details -->
+
           <span
             class="clickable"
             [routerLink]="['/app', 'groups', group.id]"
@@ -14,7 +14,6 @@
             {{ group.name }} (Teacher: {{ group.teacher.username }})
           </span>
 
-          <!-- CHANGE: explicit "Details" button linking to detail page -->
           <button
             mat-button
             color="primary"

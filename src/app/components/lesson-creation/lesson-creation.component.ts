@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { MATERIAL_IMPORTS } from '../../material.shared';
 import { LessonService, Lesson, Exercise } from '../../services/lessons.service';
 import { AuthService } from '../../services/auth.service';
-import {MatListOption, MatSelectionList} from '@angular/material/list';
 
 @Component({
   selector: 'app-lesson-creation',
