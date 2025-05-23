@@ -1,1 +1,222 @@
-<p>homework works!</p>
+<div class="homework-container">
+  <h1>Homework Management</h1>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading homework...</p>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <!-- Teacher View -->
+    <div *ngIf="isTeacher" class="teacher-view">
+
+      <!-- Actions -->
+      <div class="homework-actions">
+        <button mat-raised-button color="primary" (click)="openAssignDialog()">
+          <mat-icon>add</mat-icon>
+          Assign Homework
+        </button>
+      </div>
+
+      <!-- Teacher's Assigned Homework -->
+      <mat-card class="homework-list-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>assignment</mat-icon>
+            Assigned Homework ({{ teacherHomework.length }})
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div *ngIf="teacherHomework.length === 0" class="empty-state">
+            <mat-icon>assignment_add</mat-icon>
+            <p>No homework assigned yet</p>
+            <small>Click "Assign Homework" to create your first assignment</small>
+          </div>
+
+          <div *ngIf="teacherHomework.length > 0" class="homework-list">
+            <mat-card *ngFor="let homework of teacherHomework" class="homework-item-card">
+              <mat-card-header>
+                <mat-card-title>{{ homework.lesson.name }}</mat-card-title>
+                <mat-card-subtitle>
+                  <span class="group-info">{{ homework.group.name }}</span>
+                  <span class="separator">•</span>
+                  <span class="lesson-type">{{ homework.lesson.lesson_type | titlecase }}</span>
+                  <span class="separator">•</span>
+                  <span class="jlpt-level">{{ homework.lesson.jlpt_level }}</span>
+                </mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="homework-details">
+                  <div class="date-info">
+                    <div class="date-item">
+                      <mat-icon>event</mat-icon>
+                      <span class="date-label">Start:</span>
+                      <span class="date-value">{{ formatDate(homework.start_date) }}</span>
+                    </div>
+                    <div class="date-item">
+                      <mat-icon>event_available</mat-icon>
+                      <span class="date-label">Due:</span>
+                      <span class="date-value">{{ formatDate(homework.end_date) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="homework-stats">
+                    <div class="stat-item">
+                      <mat-icon>quiz</mat-icon>
+                      <span>{{ homework.lesson.exercise_count }} exercises</span>
+                    </div>
+                    <div class="stat-item" *ngIf="getDaysRemaining(homework) > 0">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ getDaysRemaining(homework) }} days remaining</span>
+                    </div>
+                    <div class="stat-item overdue" *ngIf="getDaysRemaining(homework) <= 0">
+                      <mat-icon>warning</mat-icon>
+                      <span>Overdue</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions>
+                <button mat-button color="primary" (click)="viewHomeworkOverview(homework)">
+                  <mat-icon>visibility</mat-icon>
+                  View Results
+                </button>
+                <button mat-button color="warn" (click)="deleteHomework(homework)">
+                  <mat-icon>delete</mat-icon>
+                  Delete
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Student View -->
+    <div *ngIf="!isTeacher" class="student-view">
+
+      <!-- Student's Homework -->
+      <mat-card class="homework-list-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>school</mat-icon>
+            Your Homework ({{ studentHomework.length }})
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div *ngIf="studentHomework.length === 0" class="empty-state">
+            <mat-icon>school</mat-icon>
+            <p>No homework assigned</p>
+            <small>Your teachers haven't assigned any homework yet</small>
+          </div>
+
+          <div *ngIf="studentHomework.length > 0" class="homework-list">
+            <mat-card *ngFor="let homework of studentHomework" class="homework-item-card">
+
+              <!-- Status Badge -->
+              <div class="status-badge" [attr.data-status]="getHomeworkStatus(homework)">
+                <mat-icon>{{ getStatusIcon(getHomeworkStatus(homework)) }}</mat-icon>
+                <span>{{ getStatusText(getHomeworkStatus(homework)) }}</span>
+              </div>
+
+              <mat-card-header>
+                <mat-card-title>{{ homework.lesson.name }}</mat-card-title>
+                <mat-card-subtitle>
+                  <span class="group-info">{{ homework.group.name }}</span>
+                  <span class="separator">•</span>
+                  <span class="teacher-info">{{ homework.teacher.first_name }} {{ homework.teacher.last_name }}</span>
+                </mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="homework-details">
+                  <div class="lesson-info">
+                    <div class="lesson-meta">
+                      <span class="lesson-type">{{ homework.lesson.lesson_type | titlecase }}</span>
+                      <span class="separator">•</span>
+                      <span class="jlpt-level">{{ homework.lesson.jlpt_level }}</span>
+                      <span class="separator">•</span>
+                      <span class="exercise-count">{{ homework.lesson.exercise_count }} exercises</span>
+                    </div>
+                  </div>
+
+                  <div class="date-info">
+                    <div class="date-item">
+                      <mat-icon>event</mat-icon>
+                      <span class="date-label">Due:</span>
+                      <span class="date-value">{{ formatDate(homework.end_date) }}</span>
+                    </div>
+                    <div class="date-item" *ngIf="isHomeworkActive(homework)">
+                      <mat-icon>schedule</mat-icon>
+                      <span class="days-remaining">{{ getDaysRemaining(homework) }} days remaining</span>
+                    </div>
+                  </div>
+
+                  <!-- Score Display -->
+                  <div class="score-display" *ngIf="getHomeworkScore(homework) !== null">
+                    <div class="score-badge" [class.excellent]="getHomeworkScore(homework)! >= 90"
+                         [class.good]="getHomeworkScore(homework)! >= 70 && getHomeworkScore(homework)! < 90"
+                         [class.needs-work]="getHomeworkScore(homework)! < 70">
+                      <mat-icon>grade</mat-icon>
+                      <span>{{ getHomeworkScore(homework) }}%</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions>
+                <!-- Start homework button -->
+                <button
+                  *ngIf="canStartHomework(homework)"
+                  mat-raised-button
+                  color="primary"
+                  (click)="startHomework(homework)">
+                  <mat-icon>play_arrow</mat-icon>
+                  Start Homework
+                </button>
+
+                <!-- View result button -->
+                <button
+                  *ngIf="getHomeworkScore(homework) !== null"
+                  mat-button
+                  color="accent"
+                  (click)="viewHomeworkResult(homework)">
+                  <mat-icon>visibility</mat-icon>
+                  View Result
+                </button>
+
+                <!-- Overdue/Not started states -->
+                <button
+                  *ngIf="getHomeworkStatus(homework) === 'overdue' && getHomeworkScore(homework) === null"
+                  mat-button
+                  disabled>
+                  <mat-icon>warning</mat-icon>
+                  Overdue
+                </button>
+
+                <button
+                  *ngIf="getHomeworkStatus(homework) === 'not_started'"
+                  mat-button
+                  disabled>
+                  <mat-icon>schedule</mat-icon>
+                  Not Started Yet
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </ng-container>
+
+  <!-- Assign Homework Dialog -->
+  <app-homework-assign
+    *ngIf="showAssignDialog"
+    (homeworkAssigned)="onHomeworkAssigned()"
+    (dialogClosed)="closeAssignDialog()">
+  </app-homework-assign>
+</div>

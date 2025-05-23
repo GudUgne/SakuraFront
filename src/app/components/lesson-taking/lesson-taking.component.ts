@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../../material.shared';
 import { LessonService, Lesson } from '../../services/lessons.service';
+import { HomeworkService } from '../../services/homework.service';
 import { MatProgressBar } from '@angular/material/progress-bar';
 
 interface ExerciseAttempt {
@@ -33,14 +34,25 @@ export class LessonTakingComponent implements OnInit {
   selectedKanji: string | null = null;
   selectedMeaning: string | null = null;
 
+  homeworkId: number | null = null;
+  isHomeworkMode = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private lessonService: LessonService
+    private lessonService: LessonService,
+    private homeworkService: HomeworkService
   ) {}
 
   ngOnInit(): void {
     const lessonId = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Check if this is homework mode
+    this.route.queryParams.subscribe(params => {
+      this.homeworkId = params['homework'] ? Number(params['homework']) : null;
+      this.isHomeworkMode = !!this.homeworkId;
+    });
+
     this.loadLesson(lessonId);
   }
 
@@ -324,10 +336,26 @@ export class LessonTakingComponent implements OnInit {
     return correctCount === exercise.pairs.length;
   }
 
-  // Results and completion
   finishLesson(): void {
     this.calculateScore();
-    this.showResults = true;
+
+    if (this.isHomeworkMode && this.homeworkId) {
+      // Submit homework result
+      this.homeworkService.submitHomeworkResult(this.homeworkId, this.score).subscribe({
+        next: (result) => {
+          console.log('Homework submitted:', result);
+          this.showResults = true;
+        },
+        error: (err) => {
+          console.error('Error submitting homework:', err);
+          // Still show results even if submission fails
+          this.showResults = true;
+          alert('Your lesson is complete, but there was an error submitting your homework score. Please contact your teacher.');
+        }
+      });
+    } else {
+      this.showResults = true;
+    }
   }
 
   calculateScore(): void {
@@ -359,7 +387,22 @@ export class LessonTakingComponent implements OnInit {
   }
 
   goBackToLessons(): void {
-    this.router.navigate(['/app/lessons']);
+    if (this.isHomeworkMode) {
+      this.router.navigate(['/app/homework']);
+    } else {
+      this.router.navigate(['/app/lessons']);
+    }
+  }
+
+  getBackButtonText(): string {
+    return this.isHomeworkMode ? 'Back to Homework' : 'Back to Lessons';
+  }
+
+  getCompletionMessage(): string {
+    if (this.isHomeworkMode) {
+      return 'Homework Completed!';
+    }
+    return 'Lesson Completed!';
   }
 
   // Helper methods

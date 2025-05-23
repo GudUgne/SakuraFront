@@ -1,0 +1,114 @@
+<mat-card class="homework-widget" *ngIf="isStudent">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>assignment</mat-icon>
+      Homework
+    </mat-card-title>
+  </mat-card-header>
+
+  <!-- Loading state -->
+  <mat-card-content *ngIf="loading" class="loading-content">
+    <mat-spinner diameter="30"></mat-spinner>
+    <p>Loading homework...</p>
+  </mat-card-content>
+
+  <!-- No homework state -->
+  <mat-card-content *ngIf="!loading && !hasUnfinishedHomework" class="no-homework">
+    <mat-icon class="success-icon">check_circle</mat-icon>
+    <h3>All caught up!</h3>
+    <p>You have no unfinished homework.</p>
+    <p class="completed-count" *ngIf="completedHomework.length > 0">
+      {{ completedHomework.length }} assignment{{ completedHomework.length !== 1 ? 's' : '' }} completed
+    </p>
+  </mat-card-content>
+
+  <!-- Has homework state -->
+  <mat-card-content *ngIf="!loading && hasUnfinishedHomework" class="has-homework">
+    <!-- Summary -->
+    <div class="homework-summary">
+      <div class="summary-badge" [class.urgent]="urgentHomework.length > 0" [class.overdue]="overdueHomework.length > 0">
+        <mat-icon>{{ urgentHomework.length > 0 || overdueHomework.length > 0 ? 'warning' : 'assignment' }}</mat-icon>
+        <span>{{ totalUnfinished }} unfinished</span>
+      </div>
+    </div>
+
+    <!-- Overdue homework (highest priority) -->
+    <div class="homework-section overdue-section" *ngIf="overdueHomework.length > 0">
+      <div class="section-header">
+        <mat-icon>error</mat-icon>
+        <span class="section-title">Overdue ({{ overdueHomework.length }})</span>
+      </div>
+      <div class="homework-list">
+        <div *ngFor="let hw of overdueHomework.slice(0, 2)" class="homework-item overdue">
+          <div class="homework-info">
+            <div class="homework-title">{{ hw.lesson.name }}</div>
+            <div class="homework-meta">
+              <span class="group-name">{{ hw.group.name }}</span>
+              <span class="due-date">{{ formatDueDate(hw) }}</span>
+            </div>
+          </div>
+          <button mat-icon-button color="warn" (click)="startHomework(hw)" class="start-btn">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Urgent homework (due soon) -->
+    <div class="homework-section urgent-section" *ngIf="urgentHomework.length > 0">
+      <div class="section-header">
+        <mat-icon>warning</mat-icon>
+        <span class="section-title">Due Soon ({{ urgentHomework.length }})</span>
+      </div>
+      <div class="homework-list">
+        <div *ngFor="let hw of urgentHomework.slice(0, 2)" class="homework-item urgent">
+          <div class="homework-info">
+            <div class="homework-title">{{ hw.lesson.name }}</div>
+            <div class="homework-meta">
+              <span class="group-name">{{ hw.group.name }}</span>
+              <span class="due-date">{{ formatDueDate(hw) }}</span>
+            </div>
+          </div>
+          <button mat-icon-button color="primary" (click)="startHomework(hw)" class="start-btn">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active homework -->
+    <div class="homework-section active-section" *ngIf="activeHomework.length > 0 && urgentHomework.length === 0 && overdueHomework.length === 0">
+      <div class="section-header">
+        <mat-icon>schedule</mat-icon>
+        <span class="section-title">Active ({{ activeHomework.length }})</span>
+      </div>
+      <div class="homework-list">
+        <div *ngFor="let hw of activeHomework.slice(0, 3)" class="homework-item active">
+          <div class="homework-info">
+            <div class="homework-title">{{ hw.lesson.name }}</div>
+            <div class="homework-meta">
+              <span class="group-name">{{ hw.group.name }}</span>
+              <span class="due-date">{{ formatDueDate(hw) }}</span>
+            </div>
+          </div>
+          <button mat-icon-button color="primary" (click)="startHomework(hw)" class="start-btn">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show more indicator -->
+    <div class="more-homework" *ngIf="totalUnfinished > 3">
+      <p>+ {{ totalUnfinished - 3 }} more assignments</p>
+    </div>
+  </mat-card-content>
+
+  <!-- Actions -->
+  <mat-card-actions>
+    <button mat-button color="primary" (click)="goToHomework()">
+      <mat-icon>visibility</mat-icon>
+      {{ hasUnfinishedHomework ? 'View All Homework' : 'View Homework' }}
+    </button>
+  </mat-card-actions>
+</mat-card>

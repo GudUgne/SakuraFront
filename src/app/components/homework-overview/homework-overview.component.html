@@ -1,0 +1,184 @@
+<div class="homework-overview-container" *ngIf="!loading">
+
+  <!-- Header -->
+  <div class="overview-header" *ngIf="overview">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <div class="header-content">
+      <h1>{{ overview.homework.lesson.name }}</h1>
+      <div class="homework-meta">
+        <span class="group-info">{{ overview.homework.group.name }}</span>
+        <span class="separator">•</span>
+        <span class="lesson-type">{{ formatLessonType(overview.homework.lesson.lesson_type) }}</span>
+        <span class="separator">•</span>
+        <span class="jlpt-level">{{ formatJlptLevel(overview.homework.lesson.jlpt_level) }}</span>
+      </div>
+      <div class="date-info">
+        <span class="date-label">Due:</span>
+        <span class="date-value">{{ formatDate(overview.homework.end_date) }}</span>
+        <span class="days-info" *ngIf="getDaysRemaining() > 0">({{ getDaysRemaining() }} days remaining)</span>
+        <span class="overdue-info" *ngIf="isHomeworkOverdue()">OVERDUE</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button mat-button (click)="exportResults()" *ngIf="overview.results.length > 0">
+        <mat-icon>download</mat-icon>
+        Export Results
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-section" *ngIf="overview">
+    <div class="stats-grid">
+
+      <!-- Completion Rate -->
+      <mat-card class="stat-card completion-rate">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon>assignment_turned_in</mat-icon>
+            <span class="stat-label">Completion Rate</span>
+          </div>
+          <div class="stat-value" [class]="getCompletionRateColor()">
+            {{ overview.completion_rate }}%
+          </div>
+          <div class="stat-detail">
+            {{ overview.completed_count }} of {{ overview.total_students }} students
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Average Score -->
+      <mat-card class="stat-card average-score">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon>trending_up</mat-icon>
+            <span class="stat-label">Average Score</span>
+          </div>
+          <div class="stat-value" [class]="getAverageScoreColor()">
+            {{ overview.average_score | number:'1.1-1' }}%
+          </div>
+          <div class="stat-detail">
+            Based on {{ overview.completed_count }} submissions
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Total Students -->
+      <mat-card class="stat-card total-students">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon>group</mat-icon>
+            <span class="stat-label">Total Students</span>
+          </div>
+          <div class="stat-value">
+            {{ overview.total_students }}
+          </div>
+          <div class="stat-detail">
+            In {{ overview.homework.group.name }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Lesson Info -->
+      <mat-card class="stat-card lesson-info">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon>quiz</mat-icon>
+            <span class="stat-label">Exercises</span>
+          </div>
+          <div class="stat-value">
+            {{ overview.homework.lesson.exercise_count }}
+          </div>
+          <div class="stat-detail">
+            {{ formatLessonType(overview.homework.lesson.lesson_type) }} exercises
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Student Results -->
+  <div class="results-section" *ngIf="overview">
+
+    <!-- Completed Students -->
+    <mat-card class="results-card" *ngIf="getCompletedStudents().length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>check_circle</mat-icon>
+          Completed ({{ getCompletedStudents().length }})
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="students-grid">
+          <div *ngFor="let result of getCompletedStudents()" class="student-result-item">
+            <div class="student-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="student-info">
+              <div class="student-name">{{ result.student.first_name }} {{ result.student.last_name }}</div>
+              <div class="student-username">{{ '@' + result.student.username }}</div>
+              <div class="completion-date" *ngIf="result.completed_date">
+                Completed: {{ formatDate(result.completed_date) }}
+              </div>
+            </div>
+            <div class="score-display">
+              <div class="score-badge" [class]="getScoreColor(result.score)">
+                <mat-icon>{{ getScoreIcon(result.score) }}</mat-icon>
+                <span>{{ result.score }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Not Completed Students -->
+    <mat-card class="results-card" *ngIf="overview.completed_count < overview.total_students">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Not Completed ({{ overview.total_students - overview.completed_count }})
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="incomplete-info">
+          <mat-icon>info</mat-icon>
+          <p>{{ overview.total_students - overview.completed_count }} students have not completed this homework yet.</p>
+          <p *ngIf="!isHomeworkOverdue()" class="time-remaining">
+            Time remaining: {{ getDaysRemaining() }} days
+          </p>
+          <p *ngIf="isHomeworkOverdue()" class="overdue-warning">
+            This homework is overdue.
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- No Results Yet -->
+    <mat-card class="results-card" *ngIf="overview.completed_count === 0">
+      <mat-card-content>
+        <div class="empty-results">
+          <mat-icon>assignment</mat-icon>
+          <h3>No submissions yet</h3>
+          <p>Students haven't started working on this homework assignment.</p>
+          <p *ngIf="!isHomeworkOverdue()">
+            Due in {{ getDaysRemaining() }} days
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="loading">
+  <mat-spinner diameter="50"></mat-spinner>
+  <p>Loading homework overview...</p>
+</div>

@@ -1,0 +1,140 @@
+<div class="dialog-backdrop" (click)="closeDialog()">
+  <div class="dialog-container" (click)="$event.stopPropagation()">
+
+    <div class="dialog-header">
+      <h2>Assign Homework</h2>
+      <button mat-icon-button (click)="closeDialog()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="dialog-content">
+
+      <div *ngIf="loading" class="loading-section">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading lessons and groups...</p>
+      </div>
+
+      <div *ngIf="!loading">
+        <form [formGroup]="assignForm" (ngSubmit)="onSubmit()">
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <!-- Lesson Selection -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Select Lesson</mat-label>
+            <mat-select formControlName="lesson_id">
+              <mat-option *ngFor="let lesson of lessons" [value]="lesson.id">
+                <div class="lesson-option">
+                  <div class="lesson-name">{{ lesson.name }}</div>
+                  <div class="lesson-details">
+                    <span class="lesson-type">{{ formatLessonType(lesson.lesson_type) }}</span>
+                    <span class="separator">•</span>
+                    <span class="jlpt-level">{{ formatJlptLevel(lesson.jlpt_level) }}</span>
+                    <span class="separator">•</span>
+                    <span class="exercise-count">{{ lesson.exercise_count }} exercises</span>
+                  </div>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="assignForm.get('lesson_id')?.hasError('required')">
+              Please select a lesson
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Group Selection -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Select Class/Group</mat-label>
+            <mat-select formControlName="group_id">
+              <mat-option *ngFor="let group of groups" [value]="group.id">
+                <div class="group-option">
+                  <div class="group-name">{{ group.name }}</div>
+                  <div class="group-teacher">Teacher: {{ getTeacherName(group) }}</div>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="assignForm.get('group_id')?.hasError('required')">
+              Please select a class/group
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Date Range -->
+          <div class="date-range">
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Start Date & Time</mat-label>
+              <input matInput type="datetime-local" formControlName="start_date">
+              <mat-error *ngIf="assignForm.get('start_date')?.hasError('required')">
+                Start date is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Due Date & Time</mat-label>
+              <input matInput type="datetime-local" formControlName="end_date">
+              <mat-error *ngIf="assignForm.get('end_date')?.hasError('required')">
+                Due date is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Preview Section -->
+          <div class="assignment-preview" *ngIf="getSelectedLesson() && getSelectedGroup()">
+            <h4>Assignment Preview</h4>
+            <div class="preview-content">
+              <div class="preview-item">
+                <mat-icon>book</mat-icon>
+                <div class="preview-details">
+                  <div class="preview-title">{{ getSelectedLesson()?.name }}</div>
+                  <div class="preview-subtitle">
+                    {{ formatLessonType(getSelectedLesson()?.lesson_type || '') }} •
+                    {{ formatJlptLevel(getSelectedLesson()?.jlpt_level || '') }} •
+                    {{ getSelectedLesson()?.exercise_count }} exercises
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-item">
+                <mat-icon>group</mat-icon>
+                <div class="preview-details">
+                  <div class="preview-title">{{ getSelectedGroup()?.name }}</div>
+                  <div class="preview-subtitle">
+                    Class by {{ getTeacherName(getSelectedGroup()) }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-item" *ngIf="assignForm.value.start_date && assignForm.value.end_date">
+                <mat-icon>schedule</mat-icon>
+                <div class="preview-details">
+                  <div class="preview-title">Available from {{ assignForm.value.start_date | date:'short' }}</div>
+                  <div class="preview-subtitle">Due: {{ assignForm.value.end_date | date:'short' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button mat-button (click)="closeDialog()" [disabled]="submitting">
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSubmit()"
+        [disabled]="assignForm.invalid || submitting">
+        <mat-spinner *ngIf="submitting" diameter="20" class="button-spinner"></mat-spinner>
+        <span *ngIf="!submitting">Assign Homework</span>
+        <span *ngIf="submitting">Assigning...</span>
+      </button>
+    </div>
+
+  </div>
+</div>

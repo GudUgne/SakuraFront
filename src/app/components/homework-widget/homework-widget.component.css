@@ -1,0 +1,288 @@
+.homework-widget {
+  flex: 1;
+  min-width: 350px;
+  max-width: 450px;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.homework-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.homework-widget mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.homework-widget mat-card-content {
+  flex-grow: 1;
+  padding: 1rem;
+}
+
+/* Loading state */
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.loading-content p {
+  margin-top: 1rem;
+  color: #666;
+}
+
+/* No homework state */
+.no-homework {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.success-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: #4caf50;
+  margin-bottom: 1rem;
+}
+
+.no-homework h3 {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.no-homework p {
+  margin: 0.25rem 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.completed-count {
+  color: #4caf50 !important;
+  font-weight: 500 !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Has homework state */
+.has-homework {
+  padding: 1rem;
+}
+
+.homework-summary {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.summary-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.summary-badge.urgent {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.summary-badge.overdue {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.summary-badge mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* Homework sections */
+.homework-section {
+  margin-bottom: 1rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.overdue-section .section-header {
+  color: #d32f2f;
+}
+
+.urgent-section .section-header {
+  color: #f57c00;
+}
+
+.active-section .section-header {
+  color: #1976d2;
+}
+
+.section-header mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+.homework-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.homework-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.homework-item.overdue {
+  border-color: #ffcdd2;
+  background-color: #ffebee;
+}
+
+.homework-item.urgent {
+  border-color: #ffe0b2;
+  background-color: #fff8e1;
+}
+
+.homework-item.active {
+  border-color: #bbdefb;
+  background-color: #e3f2fd;
+}
+
+.homework-item:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.homework-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.homework-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.homework-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.group-name {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.due-date {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.homework-item.overdue .due-date {
+  color: #d32f2f;
+}
+
+.homework-item.urgent .due-date {
+  color: #f57c00;
+}
+
+.homework-item.active .due-date {
+  color: #1976d2;
+}
+
+.start-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.start-btn mat-icon {
+  font-size: 1.2rem;
+}
+
+/* More homework indicator */
+.more-homework {
+  text-align: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.more-homework p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Card actions */
+.homework-widget mat-card-actions {
+  padding: 0.75rem 1rem;
+  background-color: #fafafa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.homework-widget mat-card-actions button {
+  width: 100%;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .homework-widget {
+    min-width: 300px;
+    max-width: 100%;
+  }
+
+  .homework-item {
+    padding: 0.5rem;
+  }
+
+  .homework-title {
+    font-size: 0.9rem;
+  }
+
+  .homework-meta {
+    font-size: 0.75rem;
+  }
+}
