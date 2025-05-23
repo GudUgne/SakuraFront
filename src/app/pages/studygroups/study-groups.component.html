@@ -37,32 +37,34 @@
     <!-- Teacher only: Pending Requests -->
     <mat-card *ngIf="!loading && isTeacher && pendingRequests?.length">
       <mat-card-title>Pending Join Requests</mat-card-title>
-      <mat-list>
-        <mat-list-item *ngFor="let req of pendingRequests">
-          <div class="request-info">
-            <div class="student-name">
-              <strong>{{ req.student.first_name }} {{ req.student.last_name }}</strong>
+      <mat-card-content>
+        <div class="requests-list">
+          <div *ngFor="let req of pendingRequests" class="request-item">
+            <div class="request-info">
+              <div class="student-name">
+                <strong>{{ req.student.first_name }} {{ req.student.last_name }}</strong>
+              </div>
+              <div class="request-details">
+                wants to join <em>{{ req.group.name }}</em>
+              </div>
             </div>
-            <div class="request-details">
-              wants to join <em>{{ req.group.name }}</em>
+            <div class="request-actions">
+              <button
+                mat-button
+                color="primary"
+                (click)="approve(req.group.id, req.student.id)">
+                Approve
+              </button>
+              <button
+                mat-button
+                color="warn"
+                (click)="cancelRequest(req.group.id, req.id)">
+                Reject
+              </button>
             </div>
           </div>
-          <div class="request-actions">
-            <button
-              mat-button
-              color="primary"
-              (click)="approve(req.group.id, req.student.id)">
-              Approve
-            </button>
-            <button
-              mat-button
-              color="warn"
-              (click)="cancelRequest(req.group.id, req.id)">
-              Reject
-            </button>
-          </div>
-        </mat-list-item>
-      </mat-list>
+        </div>
+      </mat-card-content>
     </mat-card>
 
     <!-- Student only: Pending Requests -->
@@ -70,8 +72,10 @@
       <mat-card-title>Your Pending Requests</mat-card-title>
       <mat-list>
         <mat-list-item *ngFor="let req of studentPendingRequests">
-          Waiting for approval to join {{ req.group.name }}
-          (Teacher: {{ req.group.teacher.first_name }} {{ req.group.teacher.last_name }})
+          <span class="request-text">
+            Waiting for approval to join {{ req.group.name }}
+            (Teacher: {{ req.group.teacher.first_name }} {{ req.group.teacher.last_name }})
+          </span>
           <!-- Withdraw button -->
           <button
             mat-button
