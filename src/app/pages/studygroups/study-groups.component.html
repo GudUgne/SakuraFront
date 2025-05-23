@@ -6,12 +6,11 @@
       <mat-card-title>Your Groups</mat-card-title>
       <mat-list>
         <mat-list-item *ngFor="let group of groups">
-
           <span
             class="clickable"
             [routerLink]="['/app', 'groups', group.id]"
           >
-            {{ group.name }} (Teacher: {{ group.teacher.username }})
+            {{ group.name }} (Teacher: {{ group.teacher.first_name }} {{ group.teacher.last_name }})
           </span>
 
           <button
@@ -40,20 +39,28 @@
       <mat-card-title>Pending Join Requests</mat-card-title>
       <mat-list>
         <mat-list-item *ngFor="let req of pendingRequests">
-          {{ req.student.username }} wants to join {{ req.group.name }}
-          <button
-            mat-button
-            color="primary"
-            (click)="approve(req.group.id, req.student.id)">
-            Approve
-          </button>
-          <!-- Cancel button -->
-          <button
-            mat-button
-            color="warn"
-            (click)="cancelRequest(req.group.id, req.id)">
-            Cancel
-          </button>
+          <div class="request-info">
+            <div class="student-name">
+              <strong>{{ req.student.first_name }} {{ req.student.last_name }}</strong>
+            </div>
+            <div class="request-details">
+              wants to join <em>{{ req.group.name }}</em>
+            </div>
+          </div>
+          <div class="request-actions">
+            <button
+              mat-button
+              color="primary"
+              (click)="approve(req.group.id, req.student.id)">
+              Approve
+            </button>
+            <button
+              mat-button
+              color="warn"
+              (click)="cancelRequest(req.group.id, req.id)">
+              Reject
+            </button>
+          </div>
         </mat-list-item>
       </mat-list>
     </mat-card>
@@ -64,7 +71,7 @@
       <mat-list>
         <mat-list-item *ngFor="let req of studentPendingRequests">
           Waiting for approval to join {{ req.group.name }}
-          (Teacher: {{ req.group.teacher.username }})
+          (Teacher: {{ req.group.teacher.first_name }} {{ req.group.teacher.last_name }})
           <!-- Withdraw button -->
           <button
             mat-button
@@ -97,7 +104,7 @@
           <mat-list-option
             *ngFor="let group of searchResults"
             (click)="selectGroup(group)">
-            {{ group.name }} (Teacher: {{ group.teacher.username }})
+            {{ group.name }} (Teacher: {{ group.teacher.first_name }} {{ group.teacher.last_name }})
           </mat-list-option>
         </mat-selection-list>
       </div>

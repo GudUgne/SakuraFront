@@ -2,34 +2,78 @@
   <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
 </div>
 
-<mat-card *ngIf="!loading && group">
-  <mat-card-title>{{ group.name }}</mat-card-title>
+<div *ngIf="!loading && group" class="group-detail-container">
+  <!-- Header -->
+  <mat-card class="group-header">
+    <mat-card-title>{{ group.name }}</mat-card-title>
+    <mat-card-subtitle>Class Management</mat-card-subtitle>
+  </mat-card>
 
-  <mat-tab-group>
-    <!-- Members Tab -->
-    <mat-tab label="Enrolled Students">
-      <mat-list>
-        <mat-list-item *ngFor="let s of approvedStudents">
-          {{ s.first_name }} {{ s.last_name }}
-          <!-- Optional: teacher remove button -->
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="removeStudent(s.id)">
-            <mat-icon>remove_circle</mat-icon>
-          </button>
-        </mat-list-item>
-      </mat-list>
-    </mat-tab>
+  <!-- Two Column Layout -->
+  <div class="two-column-layout">
 
-    <!-- Group Chat Tab -->
-    <mat-tab label="Class Chat">
-      <app-chat-window
-        [myUserId]="myUserId"
-        [isGroupChat]="true"
-        [groupId]="group.id"
-        [groupName]="group.name">
-      </app-chat-window>
-    </mat-tab>
-  </mat-tab-group>
-</mat-card>
+    <!-- Left Column: Students List -->
+    <div class="students-column">
+      <mat-card class="students-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>people</mat-icon>
+            Enrolled Students ({{ approvedStudents.length }})
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div *ngIf="approvedStudents.length === 0" class="no-students">
+            <mat-icon>person_add</mat-icon>
+            <p>No students enrolled yet</p>
+            <small>Students will appear here once they join and are approved</small>
+          </div>
+
+          <div *ngIf="approvedStudents.length > 0" class="students-list">
+            <div *ngFor="let student of approvedStudents" class="student-item">
+              <div class="student-avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="student-info">
+                <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
+                <div class="student-username">{{ '@' + student.username }}</div>
+              </div>
+              <!-- Only show remove button to teachers -->
+              <button
+                *ngIf="isTeacher"
+                mat-icon-button
+                color="warn"
+                (click)="removeStudent(student.id)"
+                title="Remove student from class"
+                class="remove-button">
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Right Column: Chat -->
+    <div class="chat-column">
+      <mat-card class="chat-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>chat</mat-icon>
+            Class Chat
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="chat-content">
+          <app-chat-window
+            [myUserId]="myUserId"
+            [isGroupChat]="true"
+            [groupId]="group.id"
+            [groupName]="group.name">
+          </app-chat-window>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+</div>

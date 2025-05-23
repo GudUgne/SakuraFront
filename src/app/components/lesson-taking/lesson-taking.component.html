@@ -109,34 +109,106 @@
       </div>
 
       <!-- Pair Match Exercise -->
-      <div *ngIf="currentExercise.exercise.type === 'pair-match'">
+      <div *ngIf="currentExercise.exercise.type === 'pair-match'" class="pairmatch-exercise">
         <mat-card-header>
-          <mat-card-title>Match the Kanji with its meaning</mat-card-title>
+          <mat-card-title>Match the Kanji with their meanings</mat-card-title>
+          <mat-card-subtitle>Select a kanji and then select its matching meaning</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
-          <div class="pair-match-container">
-            <div class="kanji-display">{{ currentExercise.exercise.kanji }}</div>
-            <div class="arrow">↓</div>
-            <mat-form-field appearance="outline" class="meaning-input">
-              <mat-label>Meaning</mat-label>
-              <input
-                matInput
-                [ngModel]="getPairMatchAnswer(currentExercise.exercise.kanji)"
-                (ngModelChange)="setPairMatchAnswer(currentExercise.exercise.kanji, $event)"
-                [disabled]="isCurrentExerciseAnswered"
-                placeholder="Enter the meaning">
-            </mat-form-field>
+          <div class="matching-interface">
+            <!-- Left column: Kanji -->
+            <div class="kanji-column">
+              <h5>Kanji</h5>
+              <div class="items-list">
+                <div *ngFor="let pair of currentExercise.exercise.pairs; let i = index"
+                     class="selectable-item kanji-item"
+                     [class.selected]="selectedKanji === pair.kanji"
+                     [class.matched]="isPairMatched(pair.kanji)"
+                     (click)="selectKanji(pair.kanji)">
+                  <span class="item-number">{{ i + 1 }}</span>
+                  <span class="kanji-char">{{ pair.kanji }}</span>
+                  <mat-icon *ngIf="isPairMatched(pair.kanji)" class="match-icon">check_circle</mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right column: Meanings -->
+            <div class="meanings-column">
+              <h5>Meanings</h5>
+              <div class="items-list">
+                <div *ngFor="let pair of getShuffledMeanings(); let i = index"
+                     class="selectable-item meaning-item"
+                     [class.selected]="selectedMeaning === pair.answer"
+                     [class.matched]="isMeaningMatched(pair.answer)"
+                     (click)="selectMeaning(pair.answer)">
+                  <span class="item-letter">{{ getOptionLetter(i) }}</span>
+                  <span class="meaning-text">{{ pair.answer }}</span>
+                  <mat-icon *ngIf="isMeaningMatched(pair.answer)" class="match-icon">check_circle</mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Selection Display -->
+          <div class="selection-display" *ngIf="selectedKanji || selectedMeaning">
+            <div class="selection-info">
+              <span class="selected-kanji" [class.has-selection]="selectedKanji">
+                {{ selectedKanji || '?' }}
+              </span>
+              <span class="arrow">↔</span>
+              <span class="selected-meaning" [class.has-selection]="selectedMeaning">
+                {{ selectedMeaning || '?' }}
+              </span>
+            </div>
+
+            <button mat-raised-button
+                    color="primary"
+                    (click)="makeMatch()"
+                    [disabled]="!selectedKanji || !selectedMeaning || isCurrentExerciseAnswered">
+              Match These
+            </button>
+
+            <button mat-button (click)="clearPairMatchSelections()">
+              Clear Selection
+            </button>
+          </div>
+
+          <!-- Matches Display -->
+          <div class="matches-display" *ngIf="getMatchedPairs().length > 0">
+            <h5>Your Matches ({{ getMatchedPairs().length }}/{{ currentExercise.exercise.pairs?.length }}):</h5>
+            <div class="matched-pairs">
+              <div *ngFor="let match of getMatchedPairs()"
+                   class="matched-pair"
+                   [class.correct]="isMatchCorrect(match.kanji, match.meaning)"
+                   [class.incorrect]="isCurrentExerciseAnswered && !isMatchCorrect(match.kanji, match.meaning)">
+                <span class="matched-kanji">{{ match.kanji }}</span>
+                <span class="arrow">→</span>
+                <span class="matched-meaning">{{ match.meaning }}</span>
+                <mat-icon *ngIf="isCurrentExerciseAnswered" class="result-icon">
+                  {{ isMatchCorrect(match.kanji, match.meaning) ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+              </div>
+            </div>
           </div>
 
           <!-- Show result after submission -->
           <div *ngIf="isCurrentExerciseAnswered" class="answer-feedback">
             <div class="result-badge" [class.correct]="currentExercise.isCorrect" [class.incorrect]="!currentExercise.isCorrect">
               <mat-icon>{{ currentExercise.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
-              {{ currentExercise.isCorrect ? 'Correct!' : 'Not quite right' }}
+              {{ currentExercise.isCorrect ? 'Perfect matching!' : 'Some matches need work' }}
             </div>
-            <div class="correct-answer">
-              <strong>Correct answer:</strong> {{ currentExercise.exercise.answer }}
+
+            <!-- Show correct answers for incorrect matches -->
+            <div *ngIf="!currentExercise.isCorrect" class="correct-answers">
+              <h6>Correct Matches:</h6>
+              <div class="correct-pairs">
+                <div *ngFor="let pair of currentExercise.exercise.pairs" class="correct-pair">
+                  <span class="kanji">{{ pair.kanji }}</span>
+                  <span class="arrow">→</span>
+                  <span class="meaning">{{ pair.answer }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </mat-card-content>
@@ -209,7 +281,7 @@
           </div>
           <div class="stat-item">
             <span class="stat-label">JLPT Level:</span>
-            <span class="stat-value">N{{ lesson?.jlpt_level }}</span>
+            <span class="stat-value">{{ lesson?.jlpt_level }}</span>
           </div>
         </div>
       </mat-card-content>

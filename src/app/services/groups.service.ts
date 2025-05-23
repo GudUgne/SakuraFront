@@ -8,6 +8,7 @@ export interface GroupOverview {
   teacher: {
     first_name: string;
     last_name: string;
+    username: string;
   };
 }
 
@@ -15,6 +16,7 @@ export interface Student {
   id: number;
   first_name: string;
   last_name: string;
+  username: string;
   verification_status: boolean;
 }
 
@@ -27,7 +29,7 @@ export interface GroupDetail {
 @Injectable({
   providedIn: 'root',
 })
-export class  GroupsService {
+export class GroupsService {
   private baseUrl = 'http://127.0.0.1:8000/api/groups/';
 
   constructor(private http: HttpClient) {}
