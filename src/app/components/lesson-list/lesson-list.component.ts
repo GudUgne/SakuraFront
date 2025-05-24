@@ -34,10 +34,6 @@ export class LessonListComponent implements OnInit {
     this.filteredLessons = [...this.lessons];
   }
 
-  ngOnChanges(): void {
-    this.applyFilters();
-  }
-
   applyFilters(): void {
     this.filteredLessons = this.lessons.filter(lesson => {
       let matchesSearch = true;

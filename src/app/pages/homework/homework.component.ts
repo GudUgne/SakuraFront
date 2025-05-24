@@ -31,7 +31,6 @@ export class HomeworkComponent implements OnInit {
   homeworkResults: Map<number, HomeworkResult> = new Map();
 
   // UI state
-  selectedTab = 0;
   showAssignDialog = false;
 
   constructor(

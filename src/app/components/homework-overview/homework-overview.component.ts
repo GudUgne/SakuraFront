@@ -74,14 +74,6 @@ export class HomeworkOverviewComponent implements OnInit {
     return this.overview?.results || [];
   }
 
-  getNotCompletedStudents() {
-    if (!this.overview) return [];
-
-    const completedIds = new Set(this.overview.results.map(r => r.student.id));
-    // This would need to be provided by the backend - for now return empty array
-    return [];
-  }
-
   getScoreColor(score: number): string {
     if (score >= 90) return 'score-excellent';
     if (score >= 70) return 'score-good';
@@ -158,12 +150,13 @@ export class HomeworkOverviewComponent implements OnInit {
   exportResults(): void {
     if (!this.overview) return;
 
-    // Create CSV content
-    const headers = ['Student Name', 'Username', 'Score', 'Completion Status'];
+    // Create CSV content with separate name columns
+    const headers = ['First Name', 'Last Name', 'Username', 'Score', 'Completion Status'];
     const csvContent = [
       headers.join(','),
       ...this.overview.results.map(result => [
-        `"${result.student.first_name} ${result.student.last_name}"`,
+        `"${result.student.first_name}"`,
+        `"${result.student.last_name}"`,
         result.student.username,
         result.score,
         'Completed'

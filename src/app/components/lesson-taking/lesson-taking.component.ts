@@ -394,17 +394,6 @@ export class LessonTakingComponent implements OnInit {
     }
   }
 
-  getBackButtonText(): string {
-    return this.isHomeworkMode ? 'Back to Homework' : 'Back to Lessons';
-  }
-
-  getCompletionMessage(): string {
-    if (this.isHomeworkMode) {
-      return 'Homework Completed!';
-    }
-    return 'Lesson Completed!';
-  }
-
   // Helper methods
   getOptionLetter(index: number): string {
     return String.fromCharCode(65 + index);

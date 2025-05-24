@@ -223,12 +223,4 @@ export class PairMatchComponent implements OnInit {
     return [...new Set(levels)].sort();
   }
 
-  // Helper method to suggest exercise JLPT level based on selected pairs
-  getSuggestedExerciseJlptLevel(): number {
-    if (this.selectedPairs.length === 0) return 5;
-
-    const levels = this.getSelectedPairsJlptLevels();
-    // Return the most common level, or the median if tied
-    return levels[Math.floor(levels.length / 2)];
-  }
 }
