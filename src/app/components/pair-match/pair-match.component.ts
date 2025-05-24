@@ -1,5 +1,3 @@
-// Updated pair-match.component.ts - Clean version with requested changes
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
