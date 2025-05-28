@@ -49,9 +49,16 @@ export interface HomeworkOverview {
   homework: Homework;
   total_students: number;
   completed_count: number;
+  incomplete_count: number;
   completion_rate: number;
   average_score: number;
   results: HomeworkResult[];
+  incomplete_students: {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+  }[];
 }
 
 @Injectable({

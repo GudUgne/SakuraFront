@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import {catchError, Observable, tap, throwError} from 'rxjs';
 
 interface AuthResponse {
   access_token: string;
@@ -117,14 +117,23 @@ export class AuthService {
 
   refreshToken(): Observable<any> {
     const refresh_token = localStorage.getItem('refresh_token');
-    return this.http.post<{ access: string }>(
-      'http://127.0.0.1:8000/api/users/token/refresh/',
+    console.log('Attempting refresh with token:', refresh_token);
+
+    return this.http.post<any>(
+      'http://127.0.0.1:8000/api/token/refresh/',
       { refresh: refresh_token }
     ).pipe(
       tap((response) => {
+        console.log('Refresh response:', response);
         localStorage.setItem('access_token', response.access);
+      }),
+      catchError((error) => {
+        console.error('Refresh failed:', error);
+        return throwError(() => error);
       })
     );
   }
+
+
 
 }

@@ -150,17 +150,29 @@ export class HomeworkOverviewComponent implements OnInit {
   exportResults(): void {
     if (!this.overview) return;
 
-    // Create CSV content with separate name columns
+    // Create CSV content with both completed and incomplete students
     const headers = ['First Name', 'Last Name', 'Username', 'Score', 'Completion Status'];
+
+    const completedRows = this.overview.results.map(result => [
+      `"${result.student.first_name}"`,
+      `"${result.student.last_name}"`,
+      result.student.username,
+      result.score,
+      'Completed'
+    ].join(','));
+
+    const incompleteRows = this.overview.incomplete_students.map(student => [
+      `"${student.first_name}"`,
+      `"${student.last_name}"`,
+      student.username,
+      'N/A',
+      this.isHomeworkOverdue() ? 'Not Completed (Overdue)' : 'Not Completed'
+    ].join(','));
+
     const csvContent = [
       headers.join(','),
-      ...this.overview.results.map(result => [
-        `"${result.student.first_name}"`,
-        `"${result.student.last_name}"`,
-        result.student.username,
-        result.score,
-        'Completed'
-      ].join(','))
+      ...completedRows,
+      ...incompleteRows
     ].join('\n');
 
     // Download CSV

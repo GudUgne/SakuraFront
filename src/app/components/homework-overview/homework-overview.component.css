@@ -397,4 +397,89 @@
   .student-avatar {
     margin-right: 0;
   }
+
+  .incomplete-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .incomplete-header mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+    color: #ff9800;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+  }
+
+  .incomplete-summary {
+    flex-grow: 1;
+  }
+
+  .incomplete-summary p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #666;
+  }
+
+  .time-remaining {
+    color: #1976d2 !important;
+    font-weight: 500 !important;
+  }
+
+  .overdue-warning {
+    color: #d32f2f !important;
+    font-weight: 600 !important;
+  }
+
+  /* Incomplete Students List */
+  .incomplete-students-list {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 1rem;
+  }
+
+  .incomplete-students-list h4 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .incomplete-student-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #e8eaf0;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .incomplete-student-item:hover {
+    background-color: #f0f0f0;
+    border-color: #ff9800;
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.1);
+  }
+
+  .student-avatar.incomplete {
+    background-color: #ff9800;
+  }
+
+  .status-indicator {
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+  }
+
+  .overdue-icon {
+    color: #d32f2f;
+    font-size: 1.2rem;
+  }
+
+  .pending-icon {
+    color: #ff9800;
+    font-size: 1.2rem;
+  }
 }

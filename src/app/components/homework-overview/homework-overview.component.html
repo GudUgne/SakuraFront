@@ -138,24 +138,46 @@
     </mat-card>
 
     <!-- Not Completed Students -->
-    <mat-card class="results-card" *ngIf="overview.completed_count < overview.total_students">
+    <mat-card class="results-card" *ngIf="overview.incomplete_count > 0">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>schedule</mat-icon>
-          Not Completed ({{ overview.total_students - overview.completed_count }})
+          Not Completed ({{ overview.incomplete_count }})
         </mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
-        <div class="incomplete-info">
+        <div class="incomplete-header">
           <mat-icon>info</mat-icon>
-          <p>{{ overview.total_students - overview.completed_count }} students have not completed this homework yet.</p>
-          <p *ngIf="!isHomeworkOverdue()" class="time-remaining">
-            Time remaining: {{ getDaysRemaining() }} days
-          </p>
-          <p *ngIf="isHomeworkOverdue()" class="overdue-warning">
-            This homework is overdue.
-          </p>
+          <div class="incomplete-summary">
+            <p>{{ overview.incomplete_count }} student{{ overview.incomplete_count !== 1 ? 's have' : ' has' }} not completed this homework yet.</p>
+            <p *ngIf="!isHomeworkOverdue()" class="time-remaining">
+              Time remaining: {{ getDaysRemaining() }} days
+            </p>
+            <p *ngIf="isHomeworkOverdue()" class="overdue-warning">
+              This homework is overdue.
+            </p>
+          </div>
+        </div>
+
+        <!-- List of incomplete students -->
+        <div class="incomplete-students-list" *ngIf="overview.incomplete_students && overview.incomplete_students.length > 0">
+          <h4>Students who haven't completed:</h4>
+          <div class="students-grid">
+            <div *ngFor="let student of overview.incomplete_students" class="incomplete-student-item">
+              <div class="student-avatar incomplete">
+                <mat-icon>person_outline</mat-icon>
+              </div>
+              <div class="student-info">
+                <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
+                <div class="student-username">{{ '@' + student.username }}</div>
+              </div>
+              <div class="status-indicator">
+                <mat-icon *ngIf="isHomeworkOverdue()" class="overdue-icon">warning</mat-icon>
+                <mat-icon *ngIf="!isHomeworkOverdue()" class="pending-icon">schedule</mat-icon>
+              </div>
+            </div>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
